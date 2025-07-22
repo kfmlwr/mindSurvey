@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///Users/jonathankaufmann/Documents/mindSurvey/src/app/%5Blocale%5D/page.tsx"],"sourcesContent":["import { useTranslations } from \"next-intl\";\n\n// Since this component doesn't use any interactive features\n// from React, it can be run as a Server Component.\n\nexport default function HomePage() {\n  const t = useTranslations(\"HomePage\");\n  return <h1>{t(\"title\")}</h1>;\n}\n"],"names":[],"mappings":";;;;AAAA;;;AAKe,SAAS;IACtB,MAAM,IAAI,CAAA,GAAA,6bAAA,CAAA,kBAAe,AAAD,EAAE;IAC1B,qBAAO,6WAAC;kBAAI,EAAE;;;;;;AAChB","debugId":null}}]
+}

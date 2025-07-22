@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///Users/jonathankaufmann/Documents/mindSurvey/src/i18n/navigation.ts"],"sourcesContent":["import { createNavigation } from \"next-intl/navigation\";\nimport { routing } from \"./routing\";\n\n// Lightweight wrappers around Next.js' navigation\n// APIs that consider the routing configuration\nexport const { Link, redirect, usePathname, useRouter, getPathname } =\n  createNavigation(routing);\n"],"names":[],"mappings":";;;;;;;AAAA;AACA;;;AAIO,MAAM,EAAE,IAAI,EAAE,QAAQ,EAAE,WAAW,EAAE,SAAS,EAAE,WAAW,EAAE,GAClE,CAAA,GAAA,6cAAA,CAAA,mBAAgB,AAAD,EAAE,sHAAA,CAAA,UAAO","debugId":null}},
+    {"offset": {"line": 30, "column": 0}, "map": {"version":3,"sources":["file:///Users/jonathankaufmann/Documents/mindSurvey/src/app/%5Blocale%5D/page.tsx"],"sourcesContent":["import { useTranslations } from \"next-intl\";\nimport { Link } from \"~/i18n/navigation\";\n\nexport default function HomePage() {\n  const t = useTranslations(\"HomePage\");\n  return (\n    <div>\n      <h1>{t(\"title\")}</h1>\n      <Link href=\"/about\">{t(\"about\")}</Link>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;AAAA;AACA;;;;AAEe,SAAS;IACtB,MAAM,IAAI,CAAA,GAAA,6bAAA,CAAA,kBAAe,AAAD,EAAE;IAC1B,qBACE,6WAAC;;0BACC,6WAAC;0BAAI,EAAE;;;;;;0BACP,6WAAC,yHAAA,CAAA,OAAI;gBAAC,MAAK;0BAAU,EAAE;;;;;;;;;;;;AAG7B","debugId":null}}]
+}
