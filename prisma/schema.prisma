@@ -42,6 +42,12 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum Role {
+    USER
+    LEADER
+    ADMIN
+}
+
 model User {
     id            String    @id @default(cuid())
     name          String?
@@ -49,6 +55,24 @@ model User {
     emailVerified DateTime?
     accounts      Account[]
     sessions      Session[]
+    answers       Answer[]
+
+    status Status @default(PENDING)
+
+    role  Role
+    teams Team[] @relation("TeamMembers")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Team {
+    id String @id @default(cuid())
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    members User[] @relation("TeamMembers")
 }
 
 model VerificationToken {
@@ -59,21 +83,82 @@ model VerificationToken {
     @@id([identifier, token])
 }
 
-model Question {
-    id        Int      @id @default(autoincrement())
-    text      String
+enum Quadrant {
+    BOSS
+    SUPERSTAR
+    COLABORATOR
+    ANALYST
+}
+
+model Pairs {
+    id              String            @id @default(cuid())
+    PairTranslation PairTranslation[]
+    answers         Answer[]
+
+    display_order      Int
+    adjective_positive String
+    adjective_negative String
+
+    quadrant        Quadrant
+    authority_focus Boolean
+
+    positive_x Float
+    positive_y Float
+    negative_x Float
+    negative_y Float
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum Response {
+    POSITIVE
+    NEGATIVE
+}
+
+enum Weight {
+    LOW
+    HIGH
+}
+
+model Answer {
+    id String @id @default(cuid())
+
+    pairId String
+    pair   Pairs  @relation(fields: [pairId], references: [id], onDelete: Cascade)
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    weight   Weight
+    response Response
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    adjective_positive String?
-    adjective_negative String?
+    @@unique([pairId, userId])
+}
 
-    positive_x Float?
-    positive_y Float?
-    negative_x Float?
-    negative_y Float?
+enum Language {
+    DE
+    FN
+}
 
-    @@index([text])
+model PairTranslation {
+    id String @id @default(cuid())
+
+    pairId String
+    pair   Pairs  @relation(fields: [pairId], references: [id], onDelete: Cascade)
+
+    language Language
+
+    adjective_positive String
+    adjective_negative String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([pairId, language])
 }
 
 enum Status {
