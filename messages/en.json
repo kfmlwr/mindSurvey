@@ -26,5 +26,29 @@
       "yourTeam": "Your Team",
       "resendInvite": "Resend Invite"
     }
+  },
+  "Errors": {
+    "notFound": "Page not found",
+    "serverError": "Server error",
+    "unauthorized": "Unauthorized access",
+    "notLoggedIn": "You must be logged in to access this page"
+  },
+  "LoginPage": {
+    "welcomeMessage": "Welcome to MindClip",
+    "loginButton": "Login with Email",
+    "email": "Email",
+    "termsAndConditions": "By clicking continue, you agree to our <tosLink>Terms of Service</tosLink> and <ppLink>Privacy Policy</ppLink>.",
+    "successMessage": "Check your email for a login link!",
+    "errorMessage": "An error while sending the login link. Please try again."
+  },
+  "SurveyCard": {
+    "title": "Survey",
+    "description": "Please answer the following questions.",
+    "question": "Which adjective would best describe your behavior?",
+    "frequentAdjective": "Usually",
+    "infrequentAdjective": "Sometimes",
+    "or": "or",
+    "back": "Back",
+    "progress": "{percentage} completed"
   }
 }

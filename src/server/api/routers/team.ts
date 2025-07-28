@@ -1,15 +1,15 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { Resend } from "resend";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { InviteMemberEmailTemplate } from "~/server/emails/InviteMember";
+import { env } from "~/env";
+
+const resend = new Resend(env.AUTH_RESEND_KEY);
 
 export const teamRouter = createTRPCRouter({
-  stats: protectedProcedure
+  getStats: protectedProcedure
     .input(
       z.object({
         teamId: z.string(),
@@ -18,19 +18,8 @@ export const teamRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const teamId = input.teamId;
 
-      const userTeamMember = await ctx.db.teamMember.findFirst({
-        where: { userId: ctx.session.user.id, teamId },
-      });
-
-      if (!userTeamMember || userTeamMember.role !== "LEADER") {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to view team stats",
-        });
-      }
       const team = await ctx.db.team.findUnique({
         where: { id: teamId },
-        include: { teamMembers: true },
       });
 
       if (!team) {
@@ -40,18 +29,32 @@ export const teamRouter = createTRPCRouter({
         });
       }
 
-      const memberCount = team.teamMembers.length;
-      const completedSurveys = team.teamMembers.filter(
-        (member) => member.status === "COMPLETED",
-      ).length;
+      if (team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to view this team's stats",
+        });
+      }
+
+      const inviteCount = await ctx.db.invite.count({
+        where: { teamId: team.id },
+      });
+
+      const completedInvites = await ctx.db.invite.count({
+        where: {
+          teamId: team.id,
+          status: "COMPLETED",
+        },
+      });
+
       const daysSinceCreated = Math.floor(
         (Date.now() - new Date(team.createdAt).getTime()) /
           (1000 * 60 * 60 * 24),
       );
 
       return {
-        memberCount,
-        completedSurveys,
+        memberCount: inviteCount,
+        completedSurveys: completedInvites,
         daysSinceCreated,
       };
     }),
@@ -102,17 +105,4 @@ export const teamRouter = createTRPCRouter({
 
       return { success: true, message: "Invitation sent successfully" };
     }),
-
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.post.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
-    });
-
-    return post ?? null;
-  }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });

@@ -1,15 +1,20 @@
 import { Button } from "~/components/ui/button";
 
-import { OverviewTab } from "./_components/overview";
-import { MembersTab } from "./_components/team";
+import { OverviewTab } from "../_components/overview";
+import { MembersTab } from "../_components/team";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { ResultsTab } from "./_components/results";
-import { useTranslations } from "next-intl";
+import { ResultsTab } from "../_components/results";
 import { ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default function TeamHome() {
-  const t = useTranslations("TeamPage");
+interface PageProps {
+  params: Promise<{ teamId: string }>;
+}
+
+export default async function TeamHome({ params }: PageProps) {
+  const { teamId } = await params;
+  const t = await getTranslations("TeamPage");
 
   return (
     <div className="min-h-screen md:p-6">
@@ -31,7 +36,7 @@ export default function TeamHome() {
               <TabsTrigger value="results">{t("results")}</TabsTrigger>
             </TabsList>
             <TabsContent value="overview">
-              <OverviewTab />
+              <OverviewTab teamId={teamId} />
             </TabsContent>
             <TabsContent value="team">
               <MembersTab />

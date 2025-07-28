@@ -54,41 +54,45 @@ enum TeamRole {
 }
 
 model User {
-    id            String       @id @default(cuid())
+    id            String    @id @default(cuid())
     name          String?
-    email         String?      @unique
+    email         String?   @unique
     emailVerified DateTime?
     accounts      Account[]
     sessions      Session[]
-    answers       Answer[]
-    status        Status       @default(PENDING)
-    role          Role
-    teamMembers   TeamMember[] // Neue Relation
+    role          Role      @default(USER)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    Team      Team[]
+    Invite    Invite[]
 }
 
 model Team {
-    id          String       @id @default(cuid())
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
-    teamMembers TeamMember[] // Neue Relation
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String
+    ownerId   String
+
+    owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    invitations Invite[]
 }
 
-model TeamMember {
-    userId String
+model Invite {
+    id          String  @id @default(cuid())
+    status      Status  @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
+    inviteToken String? @unique // optional, null nach Einlösung
+    email       String
+
     teamId String
+    team   Team    @relation(fields: [teamId], references: [id])
+    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String? // optional, nur Owner sind über User verbunden
 
-    role   TeamRole
-    status Status   @default(PENDING) // Fortschritt für diese Teammitgliedschaft
-
-    inviteToken String? // optional, null nach Einlösung
-
-    user User @relation(fields: [userId], references: [id])
-    team Team @relation(fields: [teamId], references: [id])
-
-    @@id([userId, teamId])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Answer    Answer[]
 }
 
 model VerificationToken {
@@ -107,9 +111,9 @@ enum Quadrant {
 }
 
 model Pairs {
-    id              String            @id @default(cuid())
-    PairTranslation PairTranslation[]
-    answers         Answer[]
+    id          String            @id @default(cuid())
+    translation PairTranslation[]
+    answers     Answer[]
 
     display_order      Int
     adjective_positive String
@@ -143,21 +147,20 @@ model Answer {
     pairId String
     pair   Pairs  @relation(fields: [pairId], references: [id], onDelete: Cascade)
 
-    userId String
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    inviteId String
+    invite   Invite @relation(fields: [inviteId], references: [id], onDelete: Cascade)
 
     weight   Weight
     response Response
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
-    @@unique([pairId, userId])
 }
 
 enum Language {
     DE
-    FN
+    FI
+    SN
 }
 
 model PairTranslation {

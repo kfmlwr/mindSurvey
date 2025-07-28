@@ -27,5 +27,29 @@
       "yourTeam": "Dein Team",
       "resendInvite": "Einladung erneut senden"
     }
+  },
+  "Errors": {
+    "notFound": "Seite nicht gefunden",
+    "serverError": "Serverfehler",
+    "unauthorized": "Unbefugter Zugriff",
+    "notLoggedIn": "Du musst eingeloggt sein, um auf diese Seite zuzugreifen"
+  },
+  "LoginPage": {
+    "welcomeMessage": "Willkommen bei MindClip",
+    "loginButton": "Mit E-Mail einloggen",
+    "email": "E-Mail",
+    "termsAndConditions": "Durch Klicken auf Weiter stimmst du unseren <tosLink>Nutzungsbedingungen</tosLink> und der <ppLink>Datenschutzrichtlinie</ppLink> zu.",
+    "successMessage": "Überprüfe deine E-Mail auf einen Login-Link!",
+    "errorMessage": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut."
+  },
+  "SurveyCard": {
+    "title": "Umfrage",
+    "description": "Bitte beantworte die folgenden Fragen.",
+    "question": "Welches Adjektiv beschreibt dein Verhalten am besten?",
+    "frequentAdjective": "Gewöhnlich",
+    "infrequentAdjective": "Manchmal",
+    "or": "oder",
+    "back": "Zurück",
+    "progress": "{percentage} abgeschlossen"
   }
 }

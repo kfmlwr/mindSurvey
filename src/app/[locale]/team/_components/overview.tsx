@@ -1,7 +1,8 @@
 import { Card, CardContent } from "~/components/ui/card";
 import { Users, FileText, Calendar, type LucideIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import React from "react";
+import { api } from "~/trpc/server";
+import { getTranslations } from "next-intl/server";
 
 type StatCardProps = {
   icon: LucideIcon;
@@ -27,8 +28,13 @@ const StatCard = ({ icon, label, value, description }: StatCardProps) => (
   </Card>
 );
 
-export default function OverviewTab() {
-  const t = useTranslations("TeamPage.overviewTab");
+interface OverviewTabProps {
+  teamId: string;
+}
+export const OverviewTab: React.FC<OverviewTabProps> = async ({ teamId }) => {
+  const t = await getTranslations("TeamPage.overviewTab");
+
+  const stats = await api.team.getStats({ teamId });
 
   return (
     <div className="space-y-6 pt-6">
@@ -38,25 +44,24 @@ export default function OverviewTab() {
         <StatCard
           icon={Users}
           label={t("teamMembers")}
-          value={6}
+          value={stats.memberCount}
           description={t("addMembers")}
         />
 
         <StatCard
           icon={FileText}
           label={t("responses")}
-          value={4}
+          value={stats.completedSurveys}
           description={t("sendReminders")}
         />
 
         <StatCard
           icon={Calendar}
           label={t("daysSinceCreation")}
-          value={12}
+          value={stats.daysSinceCreated}
           description={t("daysSinceCreationDescription")}
         />
       </div>
     </div>
   );
-}
-export { OverviewTab };
+};
