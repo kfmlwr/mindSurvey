@@ -5,28 +5,30 @@ import { MembersTab } from "./_components/team";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ResultsTab } from "./_components/results";
+import { useTranslations } from "next-intl";
+import { ArrowRight } from "lucide-react";
 
 export default function TeamHome() {
+  const t = useTranslations("TeamPage");
+
   return (
     <div className="min-h-screen md:p-6">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
-            Team Overview
-          </h1>
-          <p className="mb-4 text-gray-500">See and edit your teams profile</p>
-          <Button className="bg-gray-800 text-white hover:bg-gray-900">
-            Complete your Survey →
+          <h1 className="mb-2 text-3xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground mb-4">{t("description")}</p>
+          <Button>
+            {t("completeSurvey")} <ArrowRight />
           </Button>
         </div>
         {/* Tabs */}
         <div className="mb-6">
           <Tabs defaultValue="overview">
             <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="team">Team</TabsTrigger>
-              <TabsTrigger value="results">Results</TabsTrigger>
+              <TabsTrigger value="overview">{t("overview")}</TabsTrigger>
+              <TabsTrigger value="team">{t("team")}</TabsTrigger>
+              <TabsTrigger value="results">{t("results")}</TabsTrigger>
             </TabsList>
             <TabsContent value="overview">
               <OverviewTab />

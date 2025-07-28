@@ -48,31 +48,47 @@ enum Role {
     ADMIN
 }
 
+enum TeamRole {
+    LEADER
+    USER
+}
+
 model User {
-    id            String    @id @default(cuid())
+    id            String       @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?      @unique
     emailVerified DateTime?
     accounts      Account[]
     sessions      Session[]
     answers       Answer[]
-
-    status Status @default(PENDING)
-
-    role  Role
-    teams Team[] @relation("TeamMembers")
+    status        Status       @default(PENDING)
+    role          Role
+    teamMembers   TeamMember[] // Neue Relation
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model Team {
-    id String @id @default(cuid())
+    id          String       @id @default(cuid())
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    teamMembers TeamMember[] // Neue Relation
+}
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model TeamMember {
+    userId String
+    teamId String
 
-    members User[] @relation("TeamMembers")
+    role   TeamRole
+    status Status   @default(PENDING) // Fortschritt für diese Teammitgliedschaft
+
+    inviteToken String? // optional, null nach Einlösung
+
+    user User @relation(fields: [userId], references: [id])
+    team Team @relation(fields: [teamId], references: [id])
+
+    @@id([userId, teamId])
 }
 
 model VerificationToken {

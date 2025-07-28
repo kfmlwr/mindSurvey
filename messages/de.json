@@ -2,5 +2,30 @@
   "HomePage": {
     "title": "Hallo Welt!",
     "about": "Gehe zur Über-Seite"
+  },
+  "TeamPage": {
+    "title": "Team Übersicht",
+    "description": "Sehe und bearbeite das Profil deines Teams",
+    "completeSurvey": "Schließe deine Umfrage ab",
+    "overview": "Übersicht",
+    "team": "Team",
+    "results": "Ergebnisse",
+
+    "overviewTab": {
+      "title": "Übersicht",
+      "teamMembers": "Teammitglieder",
+      "responses": "Antworten",
+      "daysSinceCreation": "Tage seit der Erstellung",
+      "addMembers": "Mitglieder hinzufügen",
+      "sendReminders": "Erinnerungen senden",
+      "daysSinceCreationDescription": "Tage seit der Erstellung des Teams"
+    },
+    "teamTab": {
+      "title": "Mitglieder hinzufügen",
+      "removeMember": "Mitglied entfernen",
+      "invite": "Einladen",
+      "yourTeam": "Dein Team",
+      "resendInvite": "Einladung erneut senden"
+    }
   }
 }

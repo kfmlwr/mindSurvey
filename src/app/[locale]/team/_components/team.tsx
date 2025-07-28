@@ -9,8 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useTranslations } from "next-intl";
 
 export default function MembersTab() {
+  const t = useTranslations("TeamPage.teamTab");
   const teamMembers = [
     {
       id: 1,
@@ -36,20 +38,16 @@ export default function MembersTab() {
     <div className="space-y-6 pt-6">
       {/* Add members section */}
       <div>
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Add members
-        </h2>
+        <h2 className="mb-4 text-xl font-semibold">{t("title")}</h2>
         <div className="flex gap-2">
-          <Input type="email" placeholder="Email" className="flex-1" />
-          <Button className="bg-gray-800 px-6 text-white hover:bg-gray-900">
-            Invite
-          </Button>
+          <Input type="email" placeholder="E-Mail" className="flex-1" />
+          <Button>{t("invite")}</Button>
         </div>
       </div>
 
       {/* Your team section */}
       <div>
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Your team</h2>
+        <h2 className="mb-4 text-xl font-semibold">{t("yourTeam")}</h2>
         <div className="space-y-3">
           {teamMembers.map((member) => (
             <div
@@ -63,30 +61,26 @@ export default function MembersTab() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-medium text-gray-900">
-                    {member.email}
+                  <div className="font-medium">{member.email}</div>
+                  <div className="text-muted-foreground text-sm">
+                    {member.status}
                   </div>
-                  <div className="text-sm text-gray-500">{member.status}</div>
                 </div>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Resend Invitation
+                    <Mail className="mr-2" />
+                    {t("resendInvite")}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Remove
+                    <Trash2 className="mr-2" />
+                    {t("removeMember")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
