@@ -31,8 +31,9 @@ export function useSurvey(adjectives: Pair[], inviteToken: string) {
 
   const postMutation = useMutation(
     trpc.survey.submitSurvey.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
         // Handle successful submission, e.g., redirect or show a success message
+        console.log(data);
       },
       onError: (error) => {
         // Handle error, e.g., show an error message
@@ -59,8 +60,8 @@ export function useSurvey(adjectives: Pair[], inviteToken: string) {
     } else {
       const responsesToSubmit = surveyResults.map((result) => ({
         adjectiveId: result.adjective.id,
-        response: result.response as "POSITIVE" | "NEGATIVE",
-        weight: result.frequency as "LOW" | "HIGH",
+        response: result.response!,
+        weight: result.frequency!,
       }));
       postMutation.mutate({ inviteToken, responses: responsesToSubmit });
     }

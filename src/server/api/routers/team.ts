@@ -5,6 +5,7 @@ import { Resend } from "resend";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { InviteMemberEmailTemplate } from "~/server/emails/InviteMember";
 import { env } from "~/env";
+import { randomBytes } from "crypto";
 
 const resend = new Resend(env.AUTH_RESEND_KEY);
 
@@ -59,6 +60,65 @@ export const teamRouter = createTRPCRouter({
       };
     }),
 
+  listTeams: protectedProcedure.query(async ({ ctx }) => {
+    const teams = await ctx.db.team.findMany({
+      where: { ownerId: ctx.session.user.id },
+    });
+    return teams;
+  }),
+
+  listAllInvites: protectedProcedure
+    .input(z.object({ teamId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const team = await ctx.db.team.findUnique({
+        where: { id: input.teamId },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+      if (team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to view this team's invites",
+        });
+      }
+
+      const invites = await ctx.db.invite.findMany({
+        where: { teamId: input.teamId },
+        include: { team: true },
+      });
+      return invites;
+    }),
+
+  removeInvite: protectedProcedure
+    .input(z.object({ inviteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const invite = await ctx.db.invite.findUnique({
+        where: { id: input.inviteId },
+        include: { team: true },
+      });
+      if (!invite) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invite not found",
+        });
+      }
+      if (invite.team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to remove this invite",
+        });
+      }
+      await ctx.db.invite.delete({
+        where: { id: input.inviteId },
+      });
+      return { success: true };
+    }),
+
   inviteMember: protectedProcedure
     .input(
       z.object({
@@ -69,40 +129,104 @@ export const teamRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email, teamId } = input;
 
-      const userTeamMember = await ctx.db.teamMember.findFirst({
-        where: { userId: ctx.session.user.id, teamId },
+      const team = await ctx.db.team.findUnique({
+        where: { id: teamId },
+        include: { invitations: true },
       });
 
-      if (!userTeamMember || userTeamMember.role !== "LEADER") {
+      if (!team) {
         throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not authorized to invite members",
+          code: "NOT_FOUND",
+          message: "Team not found",
         });
       }
 
-      const existingUser = await ctx.db.user.findUnique({
-        where: { email },
-      });
+      if (team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to invite members to this team",
+        });
+      }
 
-      if (existingUser) {
+      const existingInvite = team.invitations.find(
+        (invite) => invite.email === email,
+      );
+
+      if (existingInvite) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "User already exists",
         });
       }
-
-      // Logic to send an invitation email would go here
+      const token = randomBytes(64).toString("hex");
 
       const { data, error } = await resend.emails.send({
         from: "casanoova <onboarding@casanoova.de>",
         to: [input.email],
         subject: "Einladung zu casanoova",
         react: await InviteMemberEmailTemplate({
-          inviterName: ctx.session.user.name,
-          token: ctx.session.user.token,
+          inviterName: ctx.session.user.email ?? undefined,
+          token: token,
         }),
       });
 
-      return { success: true, message: "Invitation sent successfully" };
+      if (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to resend invite",
+        });
+      }
+
+      const invite = await ctx.db.invite.create({
+        data: {
+          email,
+          teamId,
+          inviteToken: token,
+        },
+      });
+
+      return invite;
+    }),
+
+  resendInvite: protectedProcedure
+    .input(z.object({ inviteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const invite = await ctx.db.invite.findUnique({
+        where: { id: input.inviteId },
+        include: { team: true },
+      });
+
+      if (!invite) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invite not found",
+        });
+      }
+
+      if (invite.team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to resend this invite",
+        });
+      }
+
+      const { data, error } = await resend.emails.send({
+        from: "casanoova <onboarding@casanoova.de>",
+        to: [invite.email],
+        subject: "Einladung zu casanoova",
+        react: await InviteMemberEmailTemplate({
+          inviterName: ctx.session.user.email ?? undefined,
+          token: invite.inviteToken!,
+        }),
+      });
+
+      if (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to resend invite",
+        });
+      }
+
+      return { success: true };
     }),
 });

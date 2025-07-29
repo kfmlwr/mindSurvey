@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface InviteUserEmailTemplateProps {
-  inviterName: string;
+  inviterName?: string;
   token: string;
 }
 

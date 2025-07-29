@@ -24,7 +24,16 @@
       "removeMember": "Remove Member",
       "invite": "Invite",
       "yourTeam": "Your Team",
-      "resendInvite": "Resend Invite"
+      "resendInvite": "Resend Invite",
+      "invitingMember": "Inviting member...",
+      "memberInvited": "Member invited successfully!",
+      "errorInvitingMember": "Error inviting member, please try again.",
+      "removingMember": "Removing member...",
+      "memberRemoved": "Member removed successfully!",
+      "errorRemovingMember": "Error removing member, please try again.",
+      "resendInviteSuccess": "Invitation resent successfully!",
+      "resendInviteError": "Failed to resend invite",
+      "resendingInvite": "Resending invite..."
     }
   },
   "Errors": {

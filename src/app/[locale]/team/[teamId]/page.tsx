@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ResultsTab } from "../_components/results";
 import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { api } from "~/trpc/server";
 
 interface PageProps {
   params: Promise<{ teamId: string }>;
@@ -15,6 +16,7 @@ interface PageProps {
 export default async function TeamHome({ params }: PageProps) {
   const { teamId } = await params;
   const t = await getTranslations("TeamPage");
+  const members = await api.team.listAllInvites({ teamId });
 
   return (
     <div className="min-h-screen md:p-6">
@@ -39,7 +41,7 @@ export default async function TeamHome({ params }: PageProps) {
               <OverviewTab teamId={teamId} />
             </TabsContent>
             <TabsContent value="team">
-              <MembersTab />
+              <MembersTab members={members} teamId={teamId} />
             </TabsContent>
             <TabsContent value="results">
               <ResultsTab />

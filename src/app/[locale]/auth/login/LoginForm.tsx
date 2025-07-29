@@ -1,7 +1,7 @@
 "use client";
 
 import { GalleryVerticalEnd } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -22,13 +22,14 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<MessageType | null>(null);
   const [isPending, startTransition] = useTransition();
+  const locale = useLocale();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
 
     startTransition(async () => {
-      const result = await loginAction(email);
+      const result = await loginAction(email, locale);
 
       if (result.success) {
         setMessage({

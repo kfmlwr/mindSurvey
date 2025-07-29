@@ -25,7 +25,16 @@
       "removeMember": "Mitglied entfernen",
       "invite": "Einladen",
       "yourTeam": "Dein Team",
-      "resendInvite": "Einladung erneut senden"
+      "resendInvite": "Einladung erneut senden",
+      "invitingMember": "Mitglied wird eingeladen...",
+      "memberInvited": "Mitglied erfolgreich eingeladen!",
+      "errorInvitingMember": "Fehler beim Einladen des Mitglieds, bitte versuche es erneut.",
+      "removingMember": "Mitglied wird entfernt...",
+      "memberRemoved": "Mitglied erfolgreich entfernt!",
+      "errorRemovingMember": "Fehler beim Entfernen des Mitglieds, bitte versuche es erneut.",
+      "resendInviteSuccess": "Einladung erfolgreich erneut gesendet!",
+      "resendInviteError": "Fehler beim erneuten Senden der Einladung",
+      "resendingInvite": "Einladung wird erneut gesendet..."
     }
   },
   "Errors": {

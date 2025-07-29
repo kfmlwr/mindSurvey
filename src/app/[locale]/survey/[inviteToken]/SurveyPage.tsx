@@ -2,20 +2,17 @@
 
 import React from "react";
 import SurveyCard from "../_components/SurveyCard";
-import { useTRPC, type RouterOutputs } from "~/trpc/react";
-import { type Response, type Weight } from "@prisma/client";
+import { type RouterOutputs } from "~/trpc/react";
 import { Progress } from "~/components/ui/progress";
 import { useFormatter, useTranslations } from "next-intl";
 import { AnimatePresence } from "motion/react";
-import type { Router } from "next/router";
 import { useSurvey } from "./useSurvey";
+import { ResultCard } from "../_components/ResultCard";
 
 interface PageProps {
   adjectives: RouterOutputs["survey"]["getAdjectives"];
   inviteToken: string;
 }
-
-type Pair = RouterOutputs["survey"]["getAdjectives"][number];
 
 export default function SurveyPage({ adjectives, inviteToken }: PageProps) {
   const {
@@ -70,6 +67,8 @@ export default function SurveyPage({ adjectives, inviteToken }: PageProps) {
             direction={direction}
           />
         </AnimatePresence>
+
+        <ResultCard />
       </div>
     </div>
   );

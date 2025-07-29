@@ -8,6 +8,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { routing } from "~/i18n/routing";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
+import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Mindclip",
@@ -39,7 +40,10 @@ export default async function LocaleLayout({
     <html lang={locale} className={`${geist.variable}`}>
       <body>
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            {children}
+            <Toaster />
+          </TRPCReactProvider>
         </NextIntlClientProvider>
       </body>
     </html>
