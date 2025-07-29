@@ -15,5 +15,5 @@ export default async function Page({ params }: PageProps) {
     inviteToken,
   });
 
-  return <SurveyPage adjectives={adjectives} />;
+  return <SurveyPage adjectives={adjectives} inviteToken={inviteToken} />;
 }
