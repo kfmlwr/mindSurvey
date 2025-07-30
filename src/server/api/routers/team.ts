@@ -185,10 +185,10 @@ export const teamRouter = createTRPCRouter({
       }
       const token = randomBytes(64).toString("hex");
 
-      const { data, error } = await resend.emails.send({
-        from: "casanoova <onboarding@casanoova.de>",
+      const { error } = await resend.emails.send({
+        from: env.EMAIL_FROM,
         to: [input.email],
-        subject: "Einladung zu casanoova",
+        subject: "Invitation to MindClip",
         react: await InviteMemberEmailTemplate({
           inviterName: ctx.session.user.email ?? undefined,
           token: token,
@@ -235,10 +235,10 @@ export const teamRouter = createTRPCRouter({
         });
       }
 
-      const { data, error } = await resend.emails.send({
-        from: "casanoova <onboarding@casanoova.de>",
+      const { error } = await resend.emails.send({
+        from: env.EMAIL_FROM,
         to: [invite.email],
-        subject: "Einladung zu casanoova",
+        subject: "Invitation to MindClip",
         react: await InviteMemberEmailTemplate({
           inviterName: ctx.session.user.email ?? undefined,
           token: invite.inviteToken!,

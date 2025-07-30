@@ -1,8 +1,13 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import Resend from "next-auth/providers/resend";
+import { default as ResendProvider } from "next-auth/providers/resend";
+import { Resend } from "resend";
+import { env } from "~/env";
 
 import { db } from "~/server/db";
+import { MagicLinkEmailTemplate } from "../emails/MagicLink";
+
+const resend = new Resend(env.AUTH_RESEND_KEY);
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -32,8 +37,22 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    Resend({
+    ResendProvider({
       from: "auth@casanoova.de",
+      sendVerificationRequest: async ({ identifier: email, url }) => {
+        const res = await resend.emails.send({
+          from: env.EMAIL_FROM,
+          to: [email],
+          subject: "Login to MindClip",
+          react: await MagicLinkEmailTemplate({
+            url,
+          }),
+        });
+
+        if (res.error) {
+          throw new Error("Failed to send verification email");
+        }
+      },
     }),
   ],
   adapter: {
