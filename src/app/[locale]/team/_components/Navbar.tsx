@@ -33,7 +33,7 @@ export const Navbar = () => {
   const NAV_ITEMS = [{ name: t("teamOverview"), link: "/team" }];
 
   const activeItem =
-    NAV_ITEMS.find((item) => pathname.startsWith(item.link))?.name ?? "Team";
+    NAV_ITEMS.find((item) => pathname === item.link)?.name ?? "Team";
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
