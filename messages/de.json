@@ -81,7 +81,10 @@
     "infrequentAdjective": "Manchmal",
     "or": "oder",
     "back": "Zurück",
-    "progress": "{percentage} abgeschlossen"
+    "progress": "{percentage} abgeschlossen",
+    "submitting": "Umfrage wird eingereicht...",
+    "submitSuccess": "Umfrage erfolgreich eingereicht!",
+    "submitError": "Fehler beim Einreichen der Umfrage, bitte versuche es erneut."
   },
   "SurveyResult": {
     "title": "Umfrageergebnis",

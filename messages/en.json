@@ -80,7 +80,10 @@
     "infrequentAdjective": "Sometimes",
     "or": "or",
     "back": "Back",
-    "progress": "{percentage} completed"
+    "progress": "{percentage} completed",
+    "submitting": "Submitting survey...",
+    "submitSuccess": "Survey submitted successfully!",
+    "submitError": "Error submitting survey, please try again."
   },
   "SurveyResult": {
     "title": "Survey Result",

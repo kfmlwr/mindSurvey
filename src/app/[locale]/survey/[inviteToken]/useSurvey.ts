@@ -2,6 +2,8 @@ import React from "react";
 import type { Response, Weight } from "@prisma/client";
 import { useTRPC, type RouterOutputs } from "~/trpc/react";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 type Pair = RouterOutputs["survey"]["getAdjectives"][number];
 
@@ -38,6 +40,8 @@ export function useSurvey(
     y: number;
   } | null>(surveyStatus.result ?? null);
 
+  const t = useTranslations("SurveyCard");
+
   const postMutation = useMutation(
     trpc.survey.submitSurvey.mutationOptions({
       onSuccess: (data) => {
@@ -70,7 +74,16 @@ export function useSurvey(
         response: result.response!,
         weight: result.frequency!,
       }));
-      postMutation.mutate({ inviteToken, responses: responsesToSubmit });
+      const promise = postMutation.mutateAsync({
+        inviteToken,
+        responses: responsesToSubmit,
+      });
+
+      toast.promise(promise, {
+        loading: t("submitting"),
+        success: t("submitSuccess"),
+        error: t("submitError"),
+      });
     }
   };
 
