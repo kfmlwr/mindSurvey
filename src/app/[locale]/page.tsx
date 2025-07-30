@@ -1,14 +1,7 @@
-import { useTranslations } from "next-intl";
-import LocaleSwitch from "~/components/LanguageSwitch";
-import { Link } from "~/i18n/navigation";
+import { getLocale } from "next-intl/server";
+import { redirect } from "~/i18n/navigation";
 
-export default function HomePage() {
-  const t = useTranslations("HomePage");
-  return (
-    <>
-      <h1>{t("title")}</h1>
-      <Link href={"auth/login"}>Login</Link>
-      <LocaleSwitch />
-    </>
-  );
+export default async function HomePage() {
+  const locale = await getLocale();
+  return redirect({ href: "/auth/login", locale });
 }

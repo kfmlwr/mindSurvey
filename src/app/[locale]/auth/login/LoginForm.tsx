@@ -1,6 +1,5 @@
 "use client";
 
-import { GalleryVerticalEnd } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "~/components/ui/button";
@@ -9,6 +8,7 @@ import { Label } from "~/components/ui/label";
 import { Link } from "~/i18n/navigation";
 import { cn } from "~/lib/utils";
 import { loginAction } from "./actions";
+import { Logo } from "~/components/Logo";
 
 type MessageType = {
   message: string;
@@ -49,18 +49,10 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-2">
-            <a
-              href="#"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <div className="flex size-8 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-6" />
-              </div>
-              <span className="sr-only">MindClip</span>
-            </a>
-            <h1 className="text-xl font-bold">{t("welcomeMessage")}</h1>
+          <div className="relative mx-auto h-32 w-full max-w-xs">
+            <Logo />
           </div>
+
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
               <Label htmlFor="email">{t("email")}</Label>
