@@ -10,6 +10,8 @@ import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { Toaster } from "~/components/ui/sonner";
 import LocaleSwitch from "~/components/LanguageSwitch";
+import { ThemeProvider } from "next-themes";
+import { ThemeToggle } from "~/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Mindclip",
@@ -38,17 +40,24 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale} className={`${geist.variable}`}>
+    <html
+      lang={locale}
+      className={`${geist.variable}`}
+      suppressHydrationWarning
+    >
       <body>
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <TRPCReactProvider>
-            <div className="absolute top-4 right-4 z-50">
-              <LocaleSwitch />
-            </div>
-            {children}
-            <Toaster />
-          </TRPCReactProvider>
-        </NextIntlClientProvider>
+        <ThemeProvider attribute="class" defaultTheme="white">
+          <NextIntlClientProvider messages={messages} locale={locale}>
+            <TRPCReactProvider>
+              <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                <LocaleSwitch />
+                <ThemeToggle />
+              </div>
+              {children}
+              <Toaster />
+            </TRPCReactProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
