@@ -10,17 +10,22 @@ import { useSurvey } from "./useSurvey";
 import { ResultCard } from "../_components/ResultCard";
 import LocaleSwitch from "~/components/LanguageSwitch";
 import { ThemeToggle } from "~/components/ThemeToggle";
+import { Button } from "~/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "~/i18n/navigation";
 
 interface PageProps {
   adjectives: RouterOutputs["survey"]["getAdjectives"];
   inviteToken: string;
   surveyStatus: RouterOutputs["survey"]["getSurveyStatus"];
+  isLeader: boolean;
 }
 
 export default function SurveyPage({
   adjectives,
   inviteToken,
   surveyStatus,
+  isLeader,
 }: PageProps) {
   const {
     current,
@@ -36,6 +41,7 @@ export default function SurveyPage({
 
   const format = useFormatter();
   const t = useTranslations("SurveyCard");
+  const router = useRouter();
 
   const percentageString = format.number(processPercentage, {
     style: "percent",
@@ -60,6 +66,18 @@ export default function SurveyPage({
         <ThemeToggle />
       </div>
       <div className="mx-auto w-full max-w-2xl">
+        {isLeader && (
+          <div className="mb-6">
+            <Button
+              variant={"outline"}
+              onClick={() => router.push(`/team/${surveyStatus.invite.teamId}`)}
+            >
+              <ArrowLeft />
+              {t("backToTeam")}
+            </Button>
+          </div>
+        )}
+
         {!isCompleted && (
           <div className="mb-8">
             <Progress value={processPercentage * 100} />

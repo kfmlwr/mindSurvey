@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React, { useEffect, useRef, useState } from "react";
 import LocaleSwitch from "~/components/LanguageSwitch";
 import { Logo } from "~/components/Logo";
@@ -17,14 +18,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { usePathname, useRouter } from "~/i18n/navigation";
 
-const NAV_ITEMS = [
-  { name: "Home", link: "/" },
-  { name: "About", link: "/" },
-];
+interface NavItem {
+  name: string;
+  link: string;
+}
 
 export const Navbar = () => {
-  const [activeItem, setActiveItem] = useState(NAV_ITEMS[0]?.name ?? "");
+  const pathname = usePathname();
+  const router = useRouter();
+  const t = useTranslations("Navbar");
+
+  const NAV_ITEMS = [{ name: t("teamOverview"), link: "/team" }];
+
+  const activeItem =
+    NAV_ITEMS.find((item) => pathname.startsWith(item.link))?.name ?? "Team";
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -66,7 +75,7 @@ export const Navbar = () => {
               <NavigationMenuItem key={item.name}>
                 <NavigationMenuLink
                   data-nav-item={item.name}
-                  onClick={() => setActiveItem(item.name)}
+                  onClick={() => router.push(item.link)}
                   className={`relative cursor-pointer font-medium hover:bg-transparent ${
                     activeItem === item.name
                       ? "text-foreground"
@@ -88,7 +97,7 @@ export const Navbar = () => {
         </NavigationMenu>
 
         {/* Mobile Menu Popover */}
-        <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} />
+        <MobileNav activeItem={activeItem} navItems={NAV_ITEMS} />
 
         <div className="hidden items-center gap-2 lg:flex">
           <LocaleSwitch />
@@ -120,12 +129,13 @@ const AnimatedHamburger = ({ isOpen }: { isOpen: boolean }) => {
 
 const MobileNav = ({
   activeItem,
-  setActiveItem,
+  navItems,
 }: {
   activeItem: string;
-  setActiveItem: (item: string) => void;
+  navItems: NavItem[];
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <div className="block lg:hidden">
@@ -139,11 +149,11 @@ const MobileNav = ({
           className="relative block w-screen max-w-md overflow-hidden rounded-xl p-0 lg:hidden"
         >
           <ul className="bg-background text-foreground w-full py-4">
-            {NAV_ITEMS.map((navItem, idx) => (
+            {navItems.map((navItem, idx) => (
               <li key={idx}>
                 <a
                   href={navItem.link}
-                  onClick={() => setActiveItem(navItem.name)}
+                  onClick={() => router.push(navItem.link)}
                   className={`text-foreground flex items-center border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${
                     activeItem === navItem.name
                       ? "border-foreground text-foreground"

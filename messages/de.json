@@ -84,7 +84,8 @@
     "progress": "{percentage} abgeschlossen",
     "submitting": "Umfrage wird eingereicht...",
     "submitSuccess": "Umfrage erfolgreich eingereicht!",
-    "submitError": "Fehler beim Einreichen der Umfrage, bitte versuche es erneut."
+    "submitError": "Fehler beim Einreichen der Umfrage, bitte versuche es erneut.",
+    "backToTeam": "Zurück zum Team"
   },
   "SurveyResult": {
     "title": "Umfrageergebnis",
@@ -93,5 +94,8 @@
   "LocaleSwitcher": {
     "label": "Sprache ändern",
     "locale": "{locale, select, de {Deutsch} en {Englisch} fi {Finnisch} sn {Schwedisch} other {Unbekannt}}"
+  },
+  "Navbar": {
+    "teamOverview": "Team Übersicht"
   }
 }

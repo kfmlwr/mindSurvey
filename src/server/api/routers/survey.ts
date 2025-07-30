@@ -102,6 +102,7 @@ export const surveyRouter = createTRPCRouter({
           id: invite.id,
           email: invite.email,
           status: invite.status,
+          teamId: invite.teamId,
         },
       };
     }),
@@ -175,5 +176,39 @@ export const surveyRouter = createTRPCRouter({
       const result = calculateResult(answers);
 
       return { result };
+    }),
+
+  isLeader: publicProcedure
+    .input(
+      z.object({
+        inviteToken: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const invite = await ctx.db.invite.findUnique({
+        where: { inviteToken: input.inviteToken },
+      });
+
+      if (!invite) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invite not found",
+        });
+      }
+
+      const team = await ctx.db.team.findUnique({
+        where: { id: invite.teamId },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+
+      return ctx.session?.user?.id
+        ? team.ownerId === ctx.session.user.id
+        : false;
     }),
 });

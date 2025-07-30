@@ -18,7 +18,7 @@ export default async function TeamHome({ params }: PageProps) {
   const { teamId } = await params;
   const t = await getTranslations("TeamPage");
   const members = await api.team.listAllInvites({ teamId });
-  const leaderInvite = await api.invite.getLeaderInvite();
+  const leaderInvite = await api.invite.getLeaderInvite({ teamId });
 
   return (
     <div className="md:p-6">
@@ -28,11 +28,7 @@ export default async function TeamHome({ params }: PageProps) {
           <h1 className="mb-2 text-3xl font-bold">{t("title")}</h1>
           <p className="text-muted-foreground mb-4">{t("description")}</p>
           {leaderInvite.status === "PENDING" && (
-            <Link
-              href={`/survey/${leaderInvite.inviteToken}`}
-              passHref
-              target="_blank"
-            >
+            <Link href={`/survey/${leaderInvite.inviteToken}`} passHref>
               <Button>
                 {t("completeSurvey")} <ArrowRight />
               </Button>

@@ -23,16 +23,22 @@ export const inviteRouter = createTRPCRouter({
       return invite;
     }),
 
-  getLeaderInvite: protectedProcedure.query(async ({ ctx }) => {
-    const invite = await ctx.db.invite.findFirst({
-      where: { userId: ctx.session.user.id },
-    });
-    if (!invite) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Invite not found",
+  getLeaderInvite: protectedProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const invite = await ctx.db.invite.findFirst({
+        where: { userId: ctx.session.user.id, teamId: input.teamId },
       });
-    }
-    return invite;
-  }),
+      if (!invite) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invite not found",
+        });
+      }
+      return invite;
+    }),
 });

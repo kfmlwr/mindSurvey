@@ -19,11 +19,14 @@ export default async function Page({ params }: PageProps) {
     inviteToken,
   });
 
+  const isLeader = await api.survey.isLeader({ inviteToken });
+
   return (
     <SurveyPage
       adjectives={adjectives}
       inviteToken={inviteToken}
       surveyStatus={surveyStatus}
+      isLeader={isLeader}
     />
   );
 }

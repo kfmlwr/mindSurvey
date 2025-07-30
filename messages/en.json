@@ -83,7 +83,8 @@
     "progress": "{percentage} completed",
     "submitting": "Submitting survey...",
     "submitSuccess": "Survey submitted successfully!",
-    "submitError": "Error submitting survey, please try again."
+    "submitError": "Error submitting survey, please try again.",
+    "backToTeam": "Back to Team"
   },
   "SurveyResult": {
     "title": "Survey Result",
@@ -92,5 +93,8 @@
   "LocaleSwitcher": {
     "label": "Change Language",
     "locale": "{locale, select, de {Deutsch} en {English} fi {Finnisch} sn {Schwedisch} other {Unknown}}"
+  },
+  "Navbar": {
+    "teamOverview": "Team Overview"
   }
 }
