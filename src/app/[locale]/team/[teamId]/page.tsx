@@ -21,7 +21,7 @@ export default async function TeamHome({ params }: PageProps) {
   const leaderInvite = await api.invite.getLeaderInvite();
 
   return (
-    <div className="min-h-screen md:p-6">
+    <div className="md:p-6">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
@@ -58,7 +58,7 @@ export default async function TeamHome({ params }: PageProps) {
               />
             </TabsContent>
             <TabsContent value="results">
-              <ResultsTab />
+              <ResultsTab teamId={teamId} />
             </TabsContent>
           </Tabs>
         </div>

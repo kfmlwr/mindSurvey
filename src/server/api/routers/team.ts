@@ -6,6 +6,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { InviteMemberEmailTemplate } from "~/server/emails/InviteMember";
 import { env } from "~/env";
 import { randomBytes } from "crypto";
+import { calculateResult } from "~/lib/calculateResult";
 
 const resend = new Resend(env.AUTH_RESEND_KEY);
 
@@ -113,10 +114,10 @@ export const teamRouter = createTRPCRouter({
       }
 
       const invites = await ctx.db.invite.findMany({
-        where: { teamId: input.teamId, userId: { not: ctx.session.user.id } },
-        include: { team: true },
+        where: { teamId: input.teamId },
       });
-      return invites;
+
+      return invites.filter((invite) => invite.userId !== ctx.session.user.id);
     }),
 
   removeInvite: protectedProcedure
@@ -253,5 +254,93 @@ export const teamRouter = createTRPCRouter({
       }
 
       return { success: true };
+    }),
+
+  getTeamResults: protectedProcedure
+    .input(z.object({ teamId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const team = await ctx.db.team.findUnique({
+        where: { id: input.teamId },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+
+      if (team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to view this team's results",
+        });
+      }
+
+      const invites = await ctx.db.invite.findMany({
+        where: {
+          teamId: input.teamId,
+        },
+      });
+
+      const isAllCompleted = invites.every(
+        (invite) => invite.status === "COMPLETED",
+      );
+
+      if (!isAllCompleted) {
+        return {
+          isAllCompleted: false,
+          results: null,
+        };
+      }
+
+      const answers = await ctx.db.answer.findMany({
+        where: {
+          invite: {
+            teamId: input.teamId,
+          },
+        },
+        include: {
+          pair: true,
+        },
+      });
+
+      const result = answers.length > 0 ? calculateResult(answers) : null;
+
+      return {
+        isAllCompleted: true,
+        results: result,
+      };
+    }),
+
+  getTeamMemberResults: protectedProcedure
+    .input(z.object({ teamId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const team = await ctx.db.team.findUnique({
+        where: { id: input.teamId },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+
+      if (team.ownerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not authorized to view this team's member results",
+        });
+      }
+
+      const invites = await ctx.db.invite.findMany({
+        where: {
+          teamId: input.teamId,
+          status: "COMPLETED",
+        },
+      });
+
+      return invites;
     }),
 });

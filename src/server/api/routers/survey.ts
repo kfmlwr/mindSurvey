@@ -24,13 +24,6 @@ export const surveyRouter = createTRPCRouter({
         });
       }
 
-      if (invite.status !== "PENDING") {
-        await ctx.db.invite.update({
-          where: { inviteToken: input.inviteToken },
-          data: { status: "PENDING" },
-        });
-      }
-
       if (input.locale === "en") {
         const adjectives = await ctx.db.pairs.findMany({
           orderBy: { display_order: "asc" },
@@ -157,7 +150,7 @@ export const surveyRouter = createTRPCRouter({
       if (responses.length >= totalAdjectives) {
         await ctx.db.invite.update({
           where: { id: invite.id },
-          data: { status: "COMPLETED" },
+          data: { status: "COMPLETED", createdAt: new Date() },
         });
       } else {
         throw new TRPCError({

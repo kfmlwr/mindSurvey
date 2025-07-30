@@ -49,6 +49,13 @@
       "resendInviteSuccess": "Invitation resent successfully!",
       "resendInviteError": "Failed to resend invite",
       "resendingInvite": "Resending invite..."
+    },
+    "resultsTab": {
+      "title": "Your Results",
+      "allMembersCompleted": "All team members have completed the survey.",
+      "notAllMembersCompleted": "Not all team members have completed the survey.",
+      "completedAt": "Completed at {completedAt}",
+      "resultButton": "Results"
     }
   },
   "Errors": {

@@ -80,10 +80,11 @@ model Team {
 }
 
 model Invite {
-    id          String  @id @default(cuid())
-    status      Status  @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
-    inviteToken String? @unique // optional, null nach Einlösung
+    id          String    @id @default(cuid())
+    status      Status    @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
+    inviteToken String?   @unique // optional, null nach Einlösung
     email       String
+    completedAt DateTime?
 
     teamId String
     team   Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)

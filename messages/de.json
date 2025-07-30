@@ -50,6 +50,13 @@
       "resendInviteSuccess": "Einladung erfolgreich erneut gesendet!",
       "resendInviteError": "Fehler beim erneuten Senden der Einladung",
       "resendingInvite": "Einladung wird erneut gesendet..."
+    },
+    "resultsTab": {
+      "title": "Team Ergebnisse",
+      "allMembersCompleted": "Alle Teammitglieder haben die Umfrage abgeschlossen.",
+      "notAllMembersCompleted": "Nicht alle Teammitglieder haben die Umfrage abgeschlossen.",
+      "completedAt": "Abgeschlossen am {completedAt}",
+      "resultButton": "Ergebnisse"
     }
   },
   "Errors": {
