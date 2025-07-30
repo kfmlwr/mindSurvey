@@ -155,7 +155,8 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
                 <div>
                   <div className="font-medium">{leaderInvite.email}</div>
                   <div className="text-muted-foreground text-sm">
-                    {leaderInvite.status}
+                    {leaderInvite.status.charAt(0).toUpperCase() +
+                      leaderInvite.status.slice(1).toLowerCase()}
                   </div>
                 </div>
               </div>
@@ -176,7 +177,8 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
                 <div>
                   <div className="font-medium">{member.email}</div>
                   <div className="text-muted-foreground text-sm">
-                    {member.status}
+                    {member.status.charAt(0).toUpperCase() +
+                      member.status.slice(1).toLowerCase()}
                   </div>
                 </div>
               </div>

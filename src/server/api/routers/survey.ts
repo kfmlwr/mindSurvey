@@ -150,7 +150,7 @@ export const surveyRouter = createTRPCRouter({
       if (responses.length >= totalAdjectives) {
         await ctx.db.invite.update({
           where: { id: invite.id },
-          data: { status: "COMPLETED", createdAt: new Date() },
+          data: { status: "COMPLETED", completedAt: new Date() },
         });
       } else {
         throw new TRPCError({
