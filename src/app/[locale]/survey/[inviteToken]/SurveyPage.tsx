@@ -1,0 +1,88 @@
+"use client";
+
+import React from "react";
+import SurveyCard from "../_components/SurveyCard";
+import { type RouterOutputs } from "~/trpc/react";
+import { Progress } from "~/components/ui/progress";
+import { useFormatter, useTranslations } from "next-intl";
+import { AnimatePresence } from "motion/react";
+import { useSurvey } from "./useSurvey";
+import { ResultCard } from "../_components/ResultCard";
+
+interface PageProps {
+  adjectives: RouterOutputs["survey"]["getAdjectives"];
+  inviteToken: string;
+  surveyStatus: RouterOutputs["survey"]["getSurveyStatus"];
+}
+
+export default function SurveyPage({
+  adjectives,
+  inviteToken,
+  surveyStatus,
+}: PageProps) {
+  const {
+    current,
+    direction,
+    currentIndex,
+    processPercentage,
+    updateCurrent,
+    next,
+    back,
+    surveyResult,
+    isCompleted,
+  } = useSurvey(adjectives, inviteToken, surveyStatus);
+
+  const format = useFormatter();
+  const t = useTranslations("SurveyCard");
+
+  const percentageString = format.number(processPercentage, {
+    style: "percent",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  if (!current?.adjective) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6">
+        <div className="mx-auto w-full max-w-2xl">
+          <p className="text-muted-foreground text-sm">{t("loading")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center p-6">
+      <div className="mx-auto w-full max-w-2xl">
+        {!isCompleted && (
+          <div className="mb-8">
+            <Progress value={processPercentage * 100} />
+            <p className="text-muted-foreground text-sm">
+              {t("progress", { percentage: percentageString })}
+            </p>
+          </div>
+        )}
+
+        <AnimatePresence mode="wait">
+          {!isCompleted ? (
+            <SurveyCard
+              key={currentIndex}
+              adjective={current.adjective}
+              selectedAdjective={current.response}
+              selectedFrequency={current.frequency}
+              onAdjectiveSelect={(res) => updateCurrent(res, current.frequency)}
+              onFrequencySelect={(freq) =>
+                updateCurrent(current.response, freq)
+              }
+              onNext={next}
+              onBack={back}
+              direction={direction}
+            />
+          ) : surveyResult ? (
+            <ResultCard key="result" result={surveyResult} />
+          ) : null}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

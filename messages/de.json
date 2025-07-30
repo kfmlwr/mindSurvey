@@ -1,6 +1,83 @@
 {
-  "HomePage": {
-    "title": "Hallo Welt!",
-    "about": "Gehe zur Über-Seite"
+  "TeamOverviewPage": {
+    "title": "Deine Teams",
+    "description": "Verwalte deine Teams und erstelle neue",
+    "noTeams": "Du hast noch keine Teams. Erstelle eines, um loszulegen!",
+    "memberCount": "{count} Mitglied(er)",
+    "viewTeam": "Zum Team",
+    "createTeamDialog": {
+      "button": "Team erstellen",
+      "title": "Ein neues Team erstellen",
+      "nameLabel": "Teamname",
+      "namePlaceholder": "Gib den Teamnamen ein",
+      "nameError": "Teamname ist erforderlich",
+      "createButton": "Team erstellen",
+      "cancelButton": "Abbrechen",
+      "successMessage": "Team erfolgreich erstellt!",
+      "errorMessage": "Fehler beim Erstellen des Teams, bitte versuche es erneut.",
+      "loading": "Erstelle Team..."
+    }
+  },
+  "TeamPage": {
+    "title": "Team Übersicht",
+    "description": "Sehe und bearbeite das Profil deines Teams",
+    "completeSurvey": "Schließe deine Umfrage ab",
+    "overview": "Übersicht",
+    "team": "Team",
+    "results": "Ergebnisse",
+
+    "overviewTab": {
+      "title": "Übersicht",
+      "teamMembers": "Teammitglieder",
+      "responses": "Antworten",
+      "daysSinceCreation": "Tage seit der Erstellung",
+      "addMembers": "Mitglieder hinzufügen",
+      "sendReminders": "Erinnerungen senden",
+      "daysSinceCreationDescription": "Tage seit der Erstellung des Teams"
+    },
+    "teamTab": {
+      "title": "Mitglieder hinzufügen",
+      "removeMember": "Mitglied entfernen",
+      "invite": "Einladen",
+      "yourTeam": "Dein Team",
+      "resendInvite": "Einladung erneut senden",
+      "invitingMember": "Mitglied wird eingeladen...",
+      "memberInvited": "Mitglied erfolgreich eingeladen!",
+      "errorInvitingMember": "Fehler beim Einladen des Mitglieds, bitte versuche es erneut.",
+      "removingMember": "Mitglied wird entfernt...",
+      "memberRemoved": "Mitglied erfolgreich entfernt!",
+      "errorRemovingMember": "Fehler beim Entfernen des Mitglieds, bitte versuche es erneut.",
+      "resendInviteSuccess": "Einladung erfolgreich erneut gesendet!",
+      "resendInviteError": "Fehler beim erneuten Senden der Einladung",
+      "resendingInvite": "Einladung wird erneut gesendet..."
+    }
+  },
+  "Errors": {
+    "notFound": "Seite nicht gefunden",
+    "serverError": "Serverfehler",
+    "unauthorized": "Unbefugter Zugriff",
+    "notLoggedIn": "Du musst eingeloggt sein, um auf diese Seite zuzugreifen"
+  },
+  "LoginPage": {
+    "welcomeMessage": "Willkommen bei MindClip",
+    "loginButton": "Mit E-Mail einloggen",
+    "email": "E-Mail",
+    "termsAndConditions": "Durch Klicken auf Weiter stimmst du unseren <tosLink>Nutzungsbedingungen</tosLink> und der <ppLink>Datenschutzrichtlinie</ppLink> zu.",
+    "successMessage": "Überprüfe deine E-Mail auf einen Login-Link!",
+    "errorMessage": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut."
+  },
+  "SurveyCard": {
+    "title": "Umfrage",
+    "description": "Bitte beantworte die folgenden Fragen.",
+    "question": "Welches Adjektiv beschreibt dein Verhalten am besten?",
+    "frequentAdjective": "Gewöhnlich",
+    "infrequentAdjective": "Manchmal",
+    "or": "oder",
+    "back": "Zurück",
+    "progress": "{percentage} abgeschlossen"
+  },
+  "SurveyResult": {
+    "title": "Umfrageergebnis",
+    "description": "Dein Umfrageergebnis ist bereit."
   }
 }

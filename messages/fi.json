@@ -1,0 +1,30 @@
+{
+  "HomePage": {
+    "title": "Hello world!",
+    "about": "Go to the about page"
+  },
+  "TeamPage": {
+    "title": "Team Overview",
+    "description": "See and edit your team's profile",
+    "completeSurvey": "Complete your Survey",
+    "overview": "Overview",
+    "team": "Team",
+    "results": "Results",
+    "overviewTab": {
+      "title": "Overview",
+      "teamMembers": "Team Members",
+      "responses": "Responses",
+      "daysSinceCreation": "Days since creation",
+      "addMembers": "Add members here",
+      "sendReminders": "Send reminders here",
+      "daysSinceCreationDescription": "Days since the team was created"
+    },
+    "teamTab": {
+      "title": "Add Members",
+      "removeMember": "Remove Member",
+      "invite": "Invite",
+      "yourTeam": "Your Team",
+      "resendInvite": "Resend Invite"
+    }
+  }
+}
