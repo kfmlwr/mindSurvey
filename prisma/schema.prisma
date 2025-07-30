@@ -86,7 +86,7 @@ model Invite {
     email       String
 
     teamId String
-    team   Team    @relation(fields: [teamId], references: [id])
+    team   Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
     user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String? // optional, nur Owner sind über User verbunden
 

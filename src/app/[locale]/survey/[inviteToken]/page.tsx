@@ -15,5 +15,15 @@ export default async function Page({ params }: PageProps) {
     inviteToken,
   });
 
-  return <SurveyPage adjectives={adjectives} inviteToken={inviteToken} />;
+  const surveyStatus = await api.survey.getSurveyStatus({
+    inviteToken,
+  });
+
+  return (
+    <SurveyPage
+      adjectives={adjectives}
+      inviteToken={inviteToken}
+      surveyStatus={surveyStatus}
+    />
+  );
 }

@@ -76,6 +76,43 @@ export const surveyRouter = createTRPCRouter({
       });
     }),
 
+  getSurveyStatus: publicProcedure
+    .input(
+      z.object({
+        inviteToken: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const invite = await ctx.db.invite.findUnique({
+        where: { inviteToken: input.inviteToken },
+      });
+
+      if (!invite) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invite not found",
+        });
+      }
+
+      const answers = await ctx.db.answer.findMany({
+        where: { inviteId: invite.id },
+        include: {
+          pair: true,
+        },
+      });
+
+      const result = answers.length > 0 ? calculateResult(answers) : null;
+
+      return {
+        result,
+        invite: {
+          id: invite.id,
+          email: invite.email,
+          status: invite.status,
+        },
+      };
+    }),
+
   submitSurvey: publicProcedure
     .input(
       z.object({
@@ -115,24 +152,25 @@ export const surveyRouter = createTRPCRouter({
         weight: response.weight,
       }));
 
-      await ctx.db.answer.createMany({ data: responses });
-
-      const countAdjectives = await ctx.db.answer.count({
-        where: { inviteId: invite.id },
-      });
-
       const totalAdjectives = await ctx.db.pairs.count();
 
-      if (countAdjectives >= totalAdjectives) {
+      if (responses.length >= totalAdjectives) {
         await ctx.db.invite.update({
           where: { id: invite.id },
           data: { status: "COMPLETED" },
         });
       } else {
-        return {
-          message: "Survey submitted, but not all adjectives were answered.",
-        };
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Not all adjectives have been answered",
+        });
       }
+
+      await ctx.db.answer.deleteMany({
+        where: { inviteId: invite.id },
+      });
+
+      await ctx.db.answer.createMany({ data: responses });
 
       const answers = await ctx.db.answer.findMany({
         where: { inviteId: invite.id },

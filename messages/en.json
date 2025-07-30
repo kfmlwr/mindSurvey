@@ -1,7 +1,22 @@
 {
-  "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
+  "TeamOverviewPage": {
+    "title": "Your Teams",
+    "description": "Manage your teams and create new ones",
+    "noTeams": "You have no teams yet. Create one to get started!",
+    "memberCount": "{count} member(s)",
+    "viewTeam": "Go to Team",
+    "createTeamDialog": {
+      "button": "Create Team",
+      "title": "Create a new Team",
+      "nameLabel": "Team Name",
+      "namePlaceholder": "Enter team name",
+      "nameError": "Team name is required",
+      "createButton": "Create Team",
+      "cancelButton": "Cancel",
+      "successMessage": "Team created successfully!",
+      "errorMessage": "Error creating team, please try again.",
+      "loading": "Creating team..."
+    }
   },
   "TeamPage": {
     "title": "Team Overview",
@@ -59,5 +74,9 @@
     "or": "or",
     "back": "Back",
     "progress": "{percentage} completed"
+  },
+  "SurveyResult": {
+    "title": "Survey Result",
+    "description": "Your survey result is ready."
   }
 }

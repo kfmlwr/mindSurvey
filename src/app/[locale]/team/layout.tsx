@@ -1,5 +1,5 @@
 import { auth } from "~/server/auth";
-import { Navbar } from "../_components/navigation";
+import { Navbar } from "./_components/navigation";
 import { getTranslations } from "next-intl/server";
 
 export default async function TeamLayout({

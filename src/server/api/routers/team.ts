@@ -63,9 +63,34 @@ export const teamRouter = createTRPCRouter({
   listTeams: protectedProcedure.query(async ({ ctx }) => {
     const teams = await ctx.db.team.findMany({
       where: { ownerId: ctx.session.user.id },
+      include: { _count: { select: { invitations: true } } },
     });
     return teams;
   }),
+
+  createTeam: protectedProcedure
+    .input(z.object({ name: z.string().min(1, "Name is required") }))
+    .mutation(async ({ ctx, input }) => {
+      const { name } = input;
+
+      const team = await ctx.db.team.create({
+        data: {
+          name,
+          ownerId: ctx.session.user.id,
+        },
+      });
+
+      await ctx.db.invite.create({
+        data: {
+          email: ctx.session.user.email ?? "",
+          teamId: team.id,
+          userId: ctx.session.user.id,
+          inviteToken: randomBytes(64).toString("hex"),
+        },
+      });
+
+      return team;
+    }),
 
   listAllInvites: protectedProcedure
     .input(z.object({ teamId: z.string() }))
@@ -88,7 +113,7 @@ export const teamRouter = createTRPCRouter({
       }
 
       const invites = await ctx.db.invite.findMany({
-        where: { teamId: input.teamId },
+        where: { teamId: input.teamId, userId: { not: ctx.session.user.id } },
         include: { team: true },
       });
       return invites;

@@ -23,7 +23,7 @@ export const calculateResult = (answers: AnswerWithPair[]) => {
   });
 
   return {
-    x: xCoordinate,
-    y: yCoordinate,
+    x: xCoordinate / answers.length,
+    y: yCoordinate / answers.length,
   };
 };

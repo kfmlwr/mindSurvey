@@ -1,7 +1,11 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const inviteRouter = createTRPCRouter({
   getInvite: publicProcedure
@@ -18,4 +22,17 @@ export const inviteRouter = createTRPCRouter({
       }
       return invite;
     }),
+
+  getLeaderInvite: protectedProcedure.query(async ({ ctx }) => {
+    const invite = await ctx.db.invite.findFirst({
+      where: { userId: ctx.session.user.id },
+    });
+    if (!invite) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Invite not found",
+      });
+    }
+    return invite;
+  }),
 });

@@ -19,10 +19,11 @@ import { toast } from "sonner";
 
 interface Props {
   members: RouterOutputs["team"]["listAllInvites"];
+  leaderInvite: RouterOutputs["invite"]["getLeaderInvite"];
   teamId: string;
 }
 
-export default function MembersTab({ members, teamId }: Props) {
+export default function MembersTab({ members, teamId, leaderInvite }: Props) {
   const t = useTranslations("TeamPage.teamTab");
 
   const trpc = useTRPC();
@@ -139,6 +140,28 @@ export default function MembersTab({ members, teamId }: Props) {
       <div>
         <h2 className="mb-4 text-xl font-semibold">{t("yourTeam")}</h2>
         <div className="space-y-3">
+          {/* Leader Invite (disabled, greyed out) */}
+          {leaderInvite && (
+            <div
+              key={leaderInvite.id}
+              className="pointer-events-none flex items-center justify-between py-2 opacity-50"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-purple-500 text-white">
+                    {leaderInvite.email.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium">{leaderInvite.email}</div>
+                  <div className="text-muted-foreground text-sm">
+                    {leaderInvite.status}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Other members */}
           {data.map((member) => (
             <div
               key={member.id}

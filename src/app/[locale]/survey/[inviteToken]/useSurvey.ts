@@ -11,7 +11,11 @@ type ResultState = {
   frequency: Weight | null;
 };
 
-export function useSurvey(adjectives: Pair[], inviteToken: string) {
+export function useSurvey(
+  adjectives: Pair[],
+  inviteToken: string,
+  surveyStatus: RouterOutputs["survey"]["getSurveyStatus"],
+) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [direction, setDirection] = React.useState<"next" | "back">("next");
   const trpc = useTRPC();
@@ -29,14 +33,17 @@ export function useSurvey(adjectives: Pair[], inviteToken: string) {
   const current = surveyResults[currentIndex];
   const processPercentage = currentIndex / totalAdjectives;
 
+  const [surveyResult, setSurveyResult] = React.useState<{
+    x: number;
+    y: number;
+  } | null>(surveyStatus.result ?? null);
+
   const postMutation = useMutation(
     trpc.survey.submitSurvey.mutationOptions({
       onSuccess: (data) => {
-        // Handle successful submission, e.g., redirect or show a success message
-        console.log(data);
+        setSurveyResult(data.result);
       },
       onError: (error) => {
-        // Handle error, e.g., show an error message
         console.error("Error submitting survey:", error);
       },
     }),
@@ -84,5 +91,7 @@ export function useSurvey(adjectives: Pair[], inviteToken: string) {
     next,
     back,
     surveyResults,
+    surveyResult,
+    isCompleted: surveyResult !== null,
   };
 }
