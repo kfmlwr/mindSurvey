@@ -7,6 +7,7 @@ import { InviteMemberEmailTemplate } from "~/server/emails/InviteMember";
 import { env } from "~/env";
 import { randomBytes } from "crypto";
 import { calculateResult } from "~/lib/calculateResult";
+import { getLocale } from "next-intl/server";
 
 const resend = new Resend(env.AUTH_RESEND_KEY);
 
@@ -155,6 +156,8 @@ export const teamRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email, teamId } = input;
 
+      const locale = await getLocale();
+
       const team = await ctx.db.team.findUnique({
         where: { id: teamId },
         include: { invitations: true },
@@ -186,7 +189,7 @@ export const teamRouter = createTRPCRouter({
       }
       const token = randomBytes(64).toString("hex");
 
-      const url = `${env.BASE_URL}/survey/${token}`;
+      const url = `${env.BASE_URL}/${locale}/survey/${token}`;
 
       const { error } = await resend.emails.send({
         from: env.EMAIL_FROM,
@@ -219,6 +222,8 @@ export const teamRouter = createTRPCRouter({
   resendInvite: protectedProcedure
     .input(z.object({ inviteId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const locale = await getLocale();
+
       const invite = await ctx.db.invite.findUnique({
         where: { id: input.inviteId },
         include: { team: true },
@@ -238,7 +243,7 @@ export const teamRouter = createTRPCRouter({
         });
       }
 
-      const url = `${env.BASE_URL}/survey/${invite.inviteToken!}`;
+      const url = `${env.BASE_URL}/${locale}/survey/${invite.inviteToken!}`;
 
       const { error } = await resend.emails.send({
         from: env.EMAIL_FROM,
