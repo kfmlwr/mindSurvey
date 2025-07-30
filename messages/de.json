@@ -79,5 +79,9 @@
   "SurveyResult": {
     "title": "Umfrageergebnis",
     "description": "Dein Umfrageergebnis ist bereit."
+  },
+  "LocaleSwitcher": {
+    "label": "Sprache ändern",
+    "locale": "{locale, select, de {Deutsch} en {Englisch} fi {Finnisch} sn {Schwedisch} other {Unbekannt}}"
   }
 }

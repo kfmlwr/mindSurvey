@@ -9,6 +9,7 @@ import { routing } from "~/i18n/routing";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { Toaster } from "~/components/ui/sonner";
+import LocaleSwitch from "~/components/LanguageSwitch";
 
 export const metadata: Metadata = {
   title: "Mindclip",
@@ -41,6 +42,9 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <TRPCReactProvider>
+            <div className="absolute top-4 right-4 z-50">
+              <LocaleSwitch />
+            </div>
             {children}
             <Toaster />
           </TRPCReactProvider>
