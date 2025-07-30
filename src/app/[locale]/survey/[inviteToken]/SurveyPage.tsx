@@ -69,7 +69,7 @@ export default function SurveyPage({
         {isLeader && (
           <div className="mb-6">
             <Button
-              variant={"outline"}
+              variant={"ghost"}
               onClick={() => router.push(`/team/${surveyStatus.invite.teamId}`)}
             >
               <ArrowLeft />
