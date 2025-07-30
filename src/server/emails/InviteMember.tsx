@@ -2,15 +2,15 @@ import * as React from "react";
 
 interface InviteUserEmailTemplateProps {
   inviterName?: string;
-  token: string;
+  url: string;
 }
 
 export const InviteMemberEmailTemplate: React.FC<
   InviteUserEmailTemplateProps
-> = ({ inviterName, token }) => (
+> = ({ inviterName, url }) => (
   <div>
-    <h1>Sie wurden eingeladen</h1>
-    <p>Von: {inviterName}</p>
-    <p>Token: {token}</p>
+    <h1>You have been invited to join a team</h1>
+    <p>From: {inviterName}</p>
+    <a href={url}>Link: {url}</a>
   </div>
 );

@@ -186,13 +186,15 @@ export const teamRouter = createTRPCRouter({
       }
       const token = randomBytes(64).toString("hex");
 
+      const url = `${env.BASE_URL}/survey/${token}`;
+
       const { error } = await resend.emails.send({
         from: env.EMAIL_FROM,
         to: [input.email],
         subject: "Invitation to MindClip",
         react: await InviteMemberEmailTemplate({
           inviterName: ctx.session.user.email ?? undefined,
-          token: token,
+          url,
         }),
       });
 
@@ -236,13 +238,15 @@ export const teamRouter = createTRPCRouter({
         });
       }
 
+      const url = `${env.BASE_URL}/survey/${invite.inviteToken!}`;
+
       const { error } = await resend.emails.send({
         from: env.EMAIL_FROM,
         to: [invite.email],
         subject: "Invitation to MindClip",
         react: await InviteMemberEmailTemplate({
           inviterName: ctx.session.user.email ?? undefined,
-          token: invite.inviteToken!,
+          url,
         }),
       });
 
