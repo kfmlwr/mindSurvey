@@ -80,7 +80,7 @@ export function CreateTeamDialog({ callback }: CreateTeamDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="w-fit">
           <Plus /> {t("button")}
         </Button>
       </DialogTrigger>

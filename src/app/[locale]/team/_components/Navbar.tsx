@@ -87,12 +87,15 @@ export const Navbar = () => {
               </NavigationMenuItem>
             ))}
             {/* Active Indicator */}
-            <div
-              ref={indicatorRef}
-              className="absolute bottom-2 flex h-1 items-center justify-center px-2 transition-all duration-300"
-            >
-              <div className="bg-foreground h-0.5 w-full rounded-t-none transition-all duration-300" />
-            </div>
+            {activeItem &&
+              NAV_ITEMS.some((item) => activeItem === item.name) && (
+                <div
+                  ref={indicatorRef}
+                  className="absolute bottom-2 flex h-1 items-center justify-center px-2 transition-all duration-300"
+                >
+                  <div className="bg-foreground h-0.5 w-full rounded-t-none transition-all duration-300" />
+                </div>
+              )}
           </NavigationMenuList>
         </NavigationMenu>
 

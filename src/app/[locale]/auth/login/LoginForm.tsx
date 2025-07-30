@@ -9,6 +9,8 @@ import { Link } from "~/i18n/navigation";
 import { cn } from "~/lib/utils";
 import { loginAction } from "./actions";
 import { Logo } from "~/components/Logo";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 
 type MessageType = {
   message: string;
@@ -66,20 +68,23 @@ export function LoginForm({
                 disabled={isPending}
               />
             </div>
-            {message && (
-              <div
-                className={cn(
-                  "rounded p-2 text-center text-sm",
-                  message.type === "success"
-                    ? "bg-green-50 text-green-600"
-                    : "bg-red-50 text-red-600",
-                )}
-              >
-                {message.message}
-              </div>
+
+            {message && message.type === "success" && (
+              <Alert>
+                <CheckCircle2Icon />
+                <AlertTitle> {message.message}</AlertTitle>
+              </Alert>
             )}
+
+            {message && message.type === "error" && (
+              <Alert variant="destructive">
+                <AlertCircleIcon />
+                <AlertTitle> {message.message}</AlertTitle>
+              </Alert>
+            )}
+
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Sending..." : t("loginButton")}
+              {isPending ? t("loading") : t("loginButton")}
             </Button>
           </div>
         </div>

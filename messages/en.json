@@ -5,6 +5,8 @@
     "noTeams": "You have no teams yet. Create one to get started!",
     "memberCount": "{count} member(s)",
     "viewTeam": "Go to Team",
+    "emptyState": "No teams available",
+    "emptyStateDescription": "You haven't created any teams yet. Create one to get started.",
     "createTeamDialog": {
       "button": "Create Team",
       "title": "Create a new Team",
@@ -70,7 +72,8 @@
     "email": "Email",
     "termsAndConditions": "By clicking continue, you agree to our <tosLink>Terms of Service</tosLink> and <ppLink>Privacy Policy</ppLink>.",
     "successMessage": "Check your email for a login link!",
-    "errorMessage": "An error while sending the login link. Please try again."
+    "errorMessage": "An error while sending the login link. Please try again.",
+    "loading": "Sending login link..."
   },
   "SurveyCard": {
     "title": "Survey",

@@ -5,6 +5,8 @@
     "noTeams": "Du hast noch keine Teams. Erstelle eines, um loszulegen!",
     "memberCount": "{count} Mitglied(er)",
     "viewTeam": "Zum Team",
+    "emptyState": "Keine Teams verfügbar",
+    "emptyStateDescription": "Du hast noch keine Teams erstellt. Erstelle eines, um loszulegen.",
     "createTeamDialog": {
       "button": "Team erstellen",
       "title": "Ein neues Team erstellen",
@@ -71,7 +73,8 @@
     "email": "E-Mail",
     "termsAndConditions": "Durch Klicken auf Weiter stimmst du unseren <tosLink>Nutzungsbedingungen</tosLink> und der <ppLink>Datenschutzrichtlinie</ppLink> zu.",
     "successMessage": "Überprüfe deine E-Mail auf einen Login-Link!",
-    "errorMessage": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut."
+    "errorMessage": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
+    "loading": "Sende Login-Link..."
   },
   "SurveyCard": {
     "title": "Umfrage",

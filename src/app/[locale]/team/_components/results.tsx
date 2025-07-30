@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { AlertCircleIcon, ArrowRight, CheckCircle2Icon } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
@@ -6,6 +6,7 @@ import { ResultChart } from "../../survey/_components/ResultChart";
 import { api } from "~/trpc/server";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Link } from "~/i18n/navigation";
+import { Alert, AlertTitle } from "~/components/ui/alert";
 
 interface Props {
   teamId: string;
@@ -24,9 +25,15 @@ export async function ResultsTab({ teamId }: Props) {
 
       <h2 className="mb-4 text-xl font-semibold">Your Results</h2>
       {results.isAllCompleted ? (
-        <p className="text-muted-foreground">{t("allMembersCompleted")}</p>
+        <Alert>
+          <CheckCircle2Icon />
+          <AlertTitle>{t("allMembersCompleted")}</AlertTitle>
+        </Alert>
       ) : (
-        <p className="text-red-500">{t("notAllMembersCompleted")}</p>
+        <Alert variant={"destructive"}>
+          <AlertCircleIcon />
+          <AlertTitle>{t("notAllMembersCompleted")}</AlertTitle>
+        </Alert>
       )}
 
       {results.results && <ResultChart data={[results.results]} />}

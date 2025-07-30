@@ -9,6 +9,13 @@ import { Link } from "~/i18n/navigation";
 import { CreateTeamDialog } from "./_components/CreateTeamDialog";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
 interface Props {
   teams: RouterOutputs["team"]["listTeams"];
@@ -39,6 +46,21 @@ export default function TeamPage({ teams }: Props) {
           <h2 className="text-xl font-semibold">{t("title")}</h2>
           <CreateTeamDialog callback={refetch} />
         </div>
+
+        {data.length === 0 && (
+          <Card className="border-dashed bg-transparent shadow-none">
+            <CardContent>
+              <CardHeader className="space-y-2">
+                <CardTitle className="text-center text-xl">
+                  {t("emptyState")}
+                </CardTitle>
+                <CardDescription className="text-center">
+                  {t("emptyStateDescription")}
+                </CardDescription>
+              </CardHeader>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="space-y-3">
           {data.map((team) => (

@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { Toaster } from "~/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
+import Footer from "~/components/Footer";
 
 export const metadata: Metadata = {
   title: "Mindclip",
@@ -43,11 +44,14 @@ export default async function LocaleLayout({
       className={`${geist.variable}`}
       suppressHydrationWarning
     >
-      <body>
+      <body className="min-h-dvh flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="white">
           <NextIntlClientProvider messages={messages} locale={locale}>
             <TRPCReactProvider>
-              {children}
+              <div className="flex-1">
+                {children}
+              </div>
+              <Footer />
               <Toaster />
             </TRPCReactProvider>
           </NextIntlClientProvider>
