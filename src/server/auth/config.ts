@@ -6,6 +6,7 @@ import { env } from "~/env";
 
 import { db } from "~/server/db";
 import { MagicLinkEmailTemplate } from "../emails/MagicLink";
+import type { PrismaClient } from "@prisma/client";
 
 const resend = new Resend(env.AUTH_RESEND_KEY);
 
@@ -35,6 +36,22 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
+
+function CustomPrismaAdapter(prisma: PrismaClient) {
+  const base = PrismaAdapter(prisma);
+
+  return {
+    ...base,
+    async deleteSession(sessionToken: string) {
+      // deleteMany statt delete!
+      await prisma.session.deleteMany({
+        where: { sessionToken },
+      });
+      // deleteMany gibt einfach { count: 0 } zurück, wenn nichts gelöscht wurde (kein Fehler!)
+      return null;
+    },
+  };
+}
 export const authConfig = {
   providers: [
     ResendProvider({
@@ -56,7 +73,7 @@ export const authConfig = {
     }),
   ],
   adapter: {
-    ...PrismaAdapter(db),
+    ...CustomPrismaAdapter(db),
   },
   callbacks: {
     session: ({ session, user }) => ({

@@ -8,6 +8,8 @@ import { useFormatter, useTranslations } from "next-intl";
 import { AnimatePresence } from "motion/react";
 import { useSurvey } from "./useSurvey";
 import { ResultCard } from "../_components/ResultCard";
+import LocaleSwitch from "~/components/LanguageSwitch";
+import { ThemeToggle } from "~/components/ThemeToggle";
 
 interface PageProps {
   adjectives: RouterOutputs["survey"]["getAdjectives"];
@@ -53,6 +55,10 @@ export default function SurveyPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <LocaleSwitch />
+        <ThemeToggle />
+      </div>
       <div className="mx-auto w-full max-w-2xl">
         {!isCompleted && (
           <div className="mb-8">

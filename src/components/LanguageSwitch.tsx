@@ -12,8 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { cn } from "~/lib/utils";
 
-export default function LocaleSwitch() {
+interface Props {
+  className?: string;
+}
+
+export default function LocaleSwitch({ className }: Props) {
   const t = useTranslations("LocaleSwitcher");
   const locale = useLocale();
   const router = useRouter();
@@ -36,7 +41,7 @@ export default function LocaleSwitch() {
 
   return (
     <Select value={locale} onValueChange={onValueChange} disabled={isPending}>
-      <SelectTrigger className="w-fit">
+      <SelectTrigger className={cn("w-fit", className)}>
         <SelectValue>{t("locale", { locale })}</SelectValue>
       </SelectTrigger>
       <SelectContent>
