@@ -7,7 +7,6 @@ import { Progress } from "~/components/ui/progress";
 import { useFormatter, useTranslations } from "next-intl";
 import { AnimatePresence } from "motion/react";
 import { useSurvey } from "./useSurvey";
-import { ResultCard } from "../_components/ResultCard";
 import LocaleSwitch from "~/components/LanguageSwitch";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import { Button } from "~/components/ui/button";
@@ -18,7 +17,7 @@ interface PageProps {
   adjectives: RouterOutputs["survey"]["getAdjectives"];
   inviteToken: string;
   surveyStatus: RouterOutputs["survey"]["getSurveyStatus"];
-  isLeader: boolean;
+  isLeader: RouterOutputs["survey"]["isLeader"];
 }
 
 export default function SurveyPage({
@@ -35,9 +34,7 @@ export default function SurveyPage({
     updateCurrent,
     next,
     back,
-    surveyResult,
-    isCompleted,
-  } = useSurvey(adjectives, inviteToken, surveyStatus);
+  } = useSurvey(adjectives, inviteToken);
 
   const format = useFormatter();
   const t = useTranslations("SurveyCard");
@@ -61,12 +58,14 @@ export default function SurveyPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
-      <div className="absolute top-4 right-4 flex items-center gap-2">
-        <LocaleSwitch />
-        <ThemeToggle />
-      </div>
+      {currentIndex === 0 && (
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <LocaleSwitch />
+          <ThemeToggle />
+        </div>
+      )}
       <div className="mx-auto w-full max-w-2xl">
-        {isLeader && (
+        {isLeader.isLeader && surveyStatus.invite.status === "COMPLETED" && (
           <div className="mb-6">
             <Button
               variant={"ghost"}
@@ -78,33 +77,26 @@ export default function SurveyPage({
           </div>
         )}
 
-        {!isCompleted && (
-          <div className="mb-8">
-            <Progress value={processPercentage * 100} />
-            <p className="text-muted-foreground text-sm">
-              {t("progress", { percentage: percentageString })}
-            </p>
-          </div>
-        )}
+        <div className="mb-8">
+          <Progress value={processPercentage * 100} />
+          <p className="text-muted-foreground text-sm">
+            {t("progress", { percentage: percentageString })}
+          </p>
+        </div>
 
         <AnimatePresence mode="wait">
-          {!isCompleted ? (
-            <SurveyCard
-              key={currentIndex}
-              adjective={current.adjective}
-              selectedAdjective={current.response}
-              selectedFrequency={current.frequency}
-              onAdjectiveSelect={(res) => updateCurrent(res, current.frequency)}
-              onFrequencySelect={(freq) =>
-                updateCurrent(current.response, freq)
-              }
-              onNext={next}
-              onBack={back}
-              direction={direction}
-            />
-          ) : surveyResult ? (
-            <ResultCard key="result" result={surveyResult} />
-          ) : null}
+          <SurveyCard
+            key={currentIndex}
+            adjective={current.adjective}
+            selectedAdjective={current.response}
+            selectedFrequency={current.frequency}
+            onAdjectiveSelect={(res) => updateCurrent(res, current.frequency)}
+            onFrequencySelect={(freq) => updateCurrent(current.response, freq)}
+            onNext={next}
+            onBack={back}
+            direction={direction}
+            isLeader={isLeader}
+          />
         </AnimatePresence>
       </div>
     </div>

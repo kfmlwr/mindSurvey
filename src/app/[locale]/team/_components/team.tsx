@@ -18,8 +18,8 @@ import React from "react";
 import { toast } from "sonner";
 
 interface Props {
-  members: RouterOutputs["team"]["listAllInvites"];
-  leaderInvite: RouterOutputs["invite"]["getLeaderInvite"];
+  members?: RouterOutputs["team"]["listAllInvites"];
+  leaderInvite?: RouterOutputs["invite"]["getLeaderInvite"];
   teamId: string;
 }
 
@@ -163,7 +163,7 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
             </div>
           )}
           {/* Other members */}
-          {data.map((member) => (
+          {data?.map((member) => (
             <div
               key={member.id}
               className="flex items-center justify-between py-2"

@@ -78,6 +78,9 @@ export const surveyRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const invite = await ctx.db.invite.findUnique({
         where: { inviteToken: input.inviteToken },
+        include: {
+          user: true,
+        },
       });
 
       if (!invite) {
@@ -103,6 +106,7 @@ export const surveyRouter = createTRPCRouter({
           email: invite.email,
           status: invite.status,
           teamId: invite.teamId,
+          name: invite.user?.name ?? "",
         },
       };
     }),
@@ -187,6 +191,9 @@ export const surveyRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const invite = await ctx.db.invite.findUnique({
         where: { inviteToken: input.inviteToken },
+        include: {
+          user: true,
+        },
       });
 
       if (!invite) {
@@ -207,8 +214,11 @@ export const surveyRouter = createTRPCRouter({
         });
       }
 
-      return ctx.session?.user?.id
-        ? team.ownerId === ctx.session.user.id
-        : false;
+      return {
+        isLeader: ctx.session?.user?.id
+          ? team.ownerId === ctx.session.user.id
+          : false,
+        name: invite.user?.name ?? "",
+      };
     }),
 });

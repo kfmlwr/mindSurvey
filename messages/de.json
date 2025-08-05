@@ -80,6 +80,7 @@
     "title": "Umfrage",
     "description": "Bitte beantworte die folgenden Fragen.",
     "question": "Welches Adjektiv beschreibt dein Verhalten am besten?",
+    "peerQuestion": "Welches Adjektiv beschreibt {name}'s Verhalten am besten?",
     "frequentAdjective": "Gewöhnlich",
     "infrequentAdjective": "Manchmal",
     "or": "oder",

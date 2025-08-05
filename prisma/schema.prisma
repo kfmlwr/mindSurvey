@@ -56,6 +56,7 @@ enum TeamRole {
 model User {
     id            String    @id @default(cuid())
     name          String?
+    locale        String?   @default("de")
     email         String?   @unique
     emailVerified DateTime?
     accounts      Account[]

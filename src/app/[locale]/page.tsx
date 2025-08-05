@@ -1,14 +1,8 @@
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Checkbox } from "~/components/ui/checkbox";
 import { Card, CardContent } from "~/components/ui/card";
-import { getLocale } from "next-intl/server";
 import { auth } from "~/server/auth";
+import { SurveyForm } from "~/components/SurveyForm";
 
 export default async function MindclipSurvey() {
-  const locale = await getLocale();
-
   const session = await auth();
 
   return (
@@ -97,78 +91,7 @@ export default async function MindclipSurvey() {
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="firstName"
-                      className="font-medium text-white"
-                    >
-                      Firstname
-                    </Label>
-                    <Input
-                      id="firstName"
-                      type="text"
-                      placeholder="Firstname"
-                      className="border-0 bg-white/90 text-gray-900 placeholder:text-gray-500"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="lastName"
-                      className="font-medium text-white"
-                    >
-                      Last Name
-                    </Label>
-                    <Input
-                      id="lastName"
-                      type="text"
-                      placeholder="Last Name"
-                      className="border-0 bg-white/90 text-gray-900 placeholder:text-gray-500"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="font-medium text-white">
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="example@company.com"
-                      className="border-0 bg-white/90 text-gray-900 placeholder:text-gray-500"
-                    />
-                  </div>
-
-                  <div className="pt-4">
-                    <div className="flex items-start space-x-3">
-                      <Checkbox
-                        id="agreeToContact"
-                        className="mt-1 border-0 bg-white/90 data-[state=checked]:bg-emerald-600 data-[state=checked]:text-white"
-                      />
-                      <Label
-                        htmlFor="agreeToContact"
-                        className="cursor-pointer text-sm leading-relaxed text-emerald-100"
-                      >
-                        I agree that Mindclip can contact me on topics related
-                        to the behaviour survey
-                      </Label>
-                    </div>
-                  </div>
-
-                  <Button className="mt-6 w-full bg-white text-emerald-600 shadow-lg hover:bg-gray-100">
-                    Get Access
-                  </Button>
-                  <p className="w-full text-center text-sm text-gray-200">
-                    Already created a team?{" "}
-                    <a
-                      href={`/auth/login?locale=${locale}`}
-                      className="text-emerald-200 hover:underline"
-                    >
-                      Login here
-                    </a>
-                  </p>
-                </div>
+                <SurveyForm />
               </CardContent>
             </Card>
           </div>

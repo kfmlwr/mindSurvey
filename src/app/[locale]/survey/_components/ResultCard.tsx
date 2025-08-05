@@ -1,15 +1,19 @@
+"use client";
+
 import React from "react";
 
 import { ResultChart } from "./ResultChart";
 import { Card, CardContent } from "~/components/ui/card";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
+import MembersTab from "../../team/_components/team";
 
 interface ResultCardProps {
   result: { x: number; y: number };
+  teamId: string;
 }
 
-export function ResultCard({ result }: ResultCardProps) {
+export function ResultCard({ result, teamId }: ResultCardProps) {
   const t = useTranslations("SurveyResult");
 
   return (
@@ -18,6 +22,7 @@ export function ResultCard({ result }: ResultCardProps) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="space-y-8"
     >
       <Card>
         <CardContent>
@@ -26,6 +31,11 @@ export function ResultCard({ result }: ResultCardProps) {
             <p className="text-muted-foreground">{t("description")}</p>
           </div>
           <ResultChart data={[result]} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent>
+          <MembersTab teamId={teamId} />
         </CardContent>
       </Card>
     </motion.div>

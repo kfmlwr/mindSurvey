@@ -4,6 +4,7 @@ import { useTRPC, type RouterOutputs } from "~/trpc/react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { useRouter } from "~/i18n/navigation";
 
 type Pair = RouterOutputs["survey"]["getAdjectives"][number];
 
@@ -13,14 +14,11 @@ type ResultState = {
   frequency: Weight | null;
 };
 
-export function useSurvey(
-  adjectives: Pair[],
-  inviteToken: string,
-  surveyStatus: RouterOutputs["survey"]["getSurveyStatus"],
-) {
+export function useSurvey(adjectives: Pair[], inviteToken: string) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [direction, setDirection] = React.useState<"next" | "back">("next");
   const trpc = useTRPC();
+  const router = useRouter();
 
   const initialResults: ResultState[] = adjectives.map((adjective) => ({
     adjective,
@@ -35,17 +33,12 @@ export function useSurvey(
   const current = surveyResults[currentIndex];
   const processPercentage = currentIndex / totalAdjectives;
 
-  const [surveyResult, setSurveyResult] = React.useState<{
-    x: number;
-    y: number;
-  } | null>(surveyStatus.result ?? null);
-
   const t = useTranslations("SurveyCard");
 
   const postMutation = useMutation(
     trpc.survey.submitSurvey.mutationOptions({
-      onSuccess: (data) => {
-        setSurveyResult(data.result);
+      onSuccess: () => {
+        router.push(`/survey/${inviteToken}/results`);
       },
       onError: (error) => {
         console.error("Error submitting survey:", error);
@@ -104,7 +97,5 @@ export function useSurvey(
     next,
     back,
     surveyResults,
-    surveyResult,
-    isCompleted: surveyResult !== null,
   };
 }

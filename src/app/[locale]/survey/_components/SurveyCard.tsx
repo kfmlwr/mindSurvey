@@ -18,6 +18,7 @@ interface SurveyCardProps {
   onNext?: () => void;
   onBack?: () => void;
   direction?: "next" | "back";
+  isLeader: RouterOutputs["survey"]["isLeader"];
 }
 
 export default function SurveyCard({
@@ -29,6 +30,7 @@ export default function SurveyCard({
   onNext,
   onBack,
   direction = "next",
+  isLeader,
 }: SurveyCardProps) {
   const t = useTranslations("SurveyCard");
 
@@ -53,7 +55,11 @@ export default function SurveyCard({
 
           {/* Question */}
           <div className="mb-8">
-            <h2 className="mb-8 text-xl font-semibold">{t("question")}</h2>
+            <h2 className="mb-8 text-xl font-semibold">
+              {isLeader.isLeader
+                ? t("question")
+                : t("peerQuestion", { name: isLeader.name })}
+            </h2>
 
             {/* Adjective Selection */}
             <div className="mb-12 flex items-center justify-between">

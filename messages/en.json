@@ -79,6 +79,7 @@
     "title": "Survey",
     "description": "Please answer the following questions.",
     "question": "Which adjective would best describe your behavior?",
+    "peerQuestion": "Which adjective would best describes {name}'s behavior?",
     "frequentAdjective": "Usually",
     "infrequentAdjective": "Sometimes",
     "or": "or",
