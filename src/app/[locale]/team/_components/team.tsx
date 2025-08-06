@@ -138,7 +138,9 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
 
       {/* Your team section */}
       <div>
-        <h2 className="mb-4 text-xl font-semibold">{t("yourTeam")}</h2>
+        {((Array.isArray(data) && data.length > 0) || leaderInvite) && (
+          <h2 className="mb-4 text-xl font-semibold">{t("yourTeam")}</h2>
+        )}
         <div className="space-y-3">
           {/* Leader Invite (disabled, greyed out) */}
           {leaderInvite && (

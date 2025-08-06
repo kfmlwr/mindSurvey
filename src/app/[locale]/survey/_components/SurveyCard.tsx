@@ -39,6 +39,8 @@ export default function SurveyCard({
     { label: t("infrequentAdjective"), value: Weight.LOW },
   ];
 
+  console.log("leader name:", isLeader.name);
+
   return (
     <motion.div
       initial={{ opacity: 0, x: direction === "next" ? 50 : -50 }}

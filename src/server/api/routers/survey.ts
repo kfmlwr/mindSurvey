@@ -205,6 +205,9 @@ export const surveyRouter = createTRPCRouter({
 
       const team = await ctx.db.team.findUnique({
         where: { id: invite.teamId },
+        include: {
+          owner: true,
+        },
       });
 
       if (!team) {
@@ -218,7 +221,7 @@ export const surveyRouter = createTRPCRouter({
         isLeader: ctx.session?.user?.id
           ? team.ownerId === ctx.session.user.id
           : false,
-        name: invite.user?.name ?? "",
+        name: team.owner.name ?? "",
       };
     }),
 });
