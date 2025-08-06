@@ -77,15 +77,9 @@ export function SurveyForm() {
           name="firstName"
           render={({ field }) => (
             <FormItem className="space-y-2">
-              <FormLabel className="font-medium text-white">
-                Firstname
-              </FormLabel>
+              <FormLabel className="font-medium">Firstname</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Firstname"
-                  className="placeholder:text-muted-foreground bg-background/90 border-0"
-                  {...field}
-                />
+                <Input placeholder="Firstname" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,15 +91,9 @@ export function SurveyForm() {
           name="lastName"
           render={({ field }) => (
             <FormItem className="space-y-2">
-              <FormLabel className="font-medium text-white">
-                Last Name
-              </FormLabel>
+              <FormLabel className="font-medium">Last Name</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Last Name"
-                  className="placeholder:text-muted-foreground bg-background/90 border-0"
-                  {...field}
-                />
+                <Input placeholder="Last Name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -117,12 +105,11 @@ export function SurveyForm() {
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-2">
-              <FormLabel className="font-medium text-white">Email</FormLabel>
+              <FormLabel className="font-medium">Email</FormLabel>
               <FormControl>
                 <Input
                   type="email"
                   placeholder="example@company.com"
-                  className="placeholder:text-muted-foreground bg-background/90 border-0"
                   {...field}
                 />
               </FormControl>
@@ -141,10 +128,9 @@ export function SurveyForm() {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className="bg-background/90 mt-1 border-0 data-[state=checked]:bg-emerald-600 data-[state=checked]:text-white"
                   />
                 </FormControl>
-                <FormLabel className="cursor-pointer text-sm leading-relaxed text-emerald-100">
+                <FormLabel className="cursor-pointer text-sm leading-relaxed">
                   I agree that Mindclip can contact me on topics related to the
                   behaviour survey
                 </FormLabel>
@@ -154,10 +140,7 @@ export function SurveyForm() {
           )}
         />
 
-        <Button
-          type="submit"
-          className="bg-background hover:bg-background/90 mt-6 w-full text-emerald-600 shadow-lg hover:shadow-none"
-        >
+        <Button type="submit" className="w-full">
           Get Access
         </Button>
 
@@ -165,7 +148,7 @@ export function SurveyForm() {
           Already created a team?{" "}
           <Link
             href={`/auth/login`}
-            className="text-emerald-200 hover:underline"
+            className="underline-offset-2 hover:underline"
           >
             Login here
           </Link>
