@@ -37,7 +37,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = async ({ teamId }) => {
   const stats = await api.team.getStats({ teamId });
 
   return (
-    <div className="space-y-6 pt-6">
+    <div className="space-y-6">
       <h2 className="mb-4 text-xl font-semibold">{t("title")}</h2>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

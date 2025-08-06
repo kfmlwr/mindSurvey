@@ -13,9 +13,8 @@ export function PeerResultsCard() {
         </div>
 
         <div>
-          Thanks for completing the survey! Your results will be shared with the
-          team creator.
-          <Link href="/">To the Homepage</Link>
+          <p>{t("peerText")}</p>
+          <Link href="/">{t("createYourOwn")}</Link>
         </div>
       </CardContent>
     </Card>

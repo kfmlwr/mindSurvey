@@ -93,7 +93,10 @@
   },
   "SurveyResult": {
     "title": "Umfrageergebnis",
-    "description": "Dein Umfrageergebnis ist bereit."
+    "description": "Dein Umfrageergebnis ist bereit.",
+    "peerText": "Danke, dass du die Umfrage abgeschlossen hast!",
+    "createYourOwn": "Erstelle deine eigene Umfrage",
+    "toTeam": "Dein Team"
   },
   "LocaleSwitcher": {
     "label": "Sprache ändern",

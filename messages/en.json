@@ -92,7 +92,10 @@
   },
   "SurveyResult": {
     "title": "Survey Result",
-    "description": "Your survey result is ready."
+    "description": "Your survey result is ready.",
+    "peerText": "Thanks for completing the survey!",
+    "createYourOwn": "Create your own Survey",
+    "toTeam": "Your Team"
   },
   "LocaleSwitcher": {
     "label": "Change Language",

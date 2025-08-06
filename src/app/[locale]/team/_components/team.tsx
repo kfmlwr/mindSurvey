@@ -112,7 +112,7 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
   };
 
   return (
-    <div className="space-y-6 pt-6">
+    <div className="space-y-6">
       {/* Add members section */}
       <div>
         <h2 className="mb-4 text-xl font-semibold">{t("title")}</h2>

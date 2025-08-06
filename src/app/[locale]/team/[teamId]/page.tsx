@@ -38,7 +38,7 @@ export default async function TeamHome({ params }: PageProps) {
         {/* Tabs */}
         <div className="mb-6">
           <Tabs defaultValue="overview">
-            <TabsList>
+            <TabsList className="mb-6">
               <TabsTrigger value="overview">{t("overview")}</TabsTrigger>
               <TabsTrigger value="team">{t("team")}</TabsTrigger>
               <TabsTrigger value="results">{t("results")}</TabsTrigger>

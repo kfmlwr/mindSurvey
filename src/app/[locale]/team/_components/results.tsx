@@ -38,7 +38,7 @@ export async function ResultsTab({ teamId }: Props) {
 
       {results.results && <ResultChart data={[results.results]} />}
 
-      <div className="mt-6 space-y-3">
+      <div className="space-y-3">
         {invites.map((member) => (
           <div
             key={member.id}
