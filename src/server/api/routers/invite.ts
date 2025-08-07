@@ -3,7 +3,6 @@ import { AuthError } from "next-auth";
 import { getLocale } from "next-intl/server";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
-import { env } from "~/env";
 
 import {
   createTRPCRouter,
@@ -68,16 +67,16 @@ export const inviteRouter = createTRPCRouter({
         });
       }
 
-      const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${env.CAPTCHA_SECRET_KEY}&response=${captchaToken}`;
-      const googleRes = await fetch(verifyUrl, { method: "POST" });
-      const result = (await googleRes.json()) as { success: boolean };
+      // const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${env.CAPTCHA_SECRET_KEY}&response=${captchaToken}`;
+      // const googleRes = await fetch(verifyUrl, { method: "POST" });
+      // const result = (await googleRes.json()) as { success: boolean };
 
-      if (!result.success) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Captcha verification failed",
-        });
-      }
+      // if (!result.success) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "Captcha verification failed",
+      //   });
+      // }
 
       let owner = await ctx.db.user.findFirst({
         where: { email },
