@@ -1,6 +1,7 @@
 import { api } from "~/trpc/server";
 import { getLocale } from "next-intl/server";
 import SurveyPage from "./SurveyPage";
+import { redirect } from "~/i18n/navigation";
 
 interface PageProps {
   params: Promise<{ inviteToken: string }>;
@@ -20,6 +21,10 @@ export default async function Page({ params }: PageProps) {
   });
 
   const isLeader = await api.survey.isLeader({ inviteToken });
+
+  if (surveyStatus.invite.status === "COMPLETED") {
+    redirect({ href: `/survey/${inviteToken}/results`, locale });
+  }
 
   return (
     <SurveyPage

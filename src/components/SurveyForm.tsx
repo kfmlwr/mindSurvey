@@ -18,6 +18,9 @@ import {
 import { Input } from "~/components/ui/input";
 import { Link } from "~/i18n/navigation";
 import { useTRPC } from "~/trpc/react";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useRef } from "react";
+import { env } from "~/env";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -31,6 +34,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function SurveyForm() {
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,11 +60,14 @@ export function SurveyForm() {
   );
 
   const handleSubmit = (data: FormData) => {
+    const token = recaptchaRef.current?.getValue();
+
     const promise = createEmailMutation.mutateAsync({
       email: data.email,
       firstname: data.firstName,
       lastname: data.lastName,
       termsAndConditions: data.agreeToContact,
+      captchaToken: token ?? "",
     });
 
     toast.promise(promise, {
@@ -116,6 +124,11 @@ export function SurveyForm() {
               <FormMessage />
             </FormItem>
           )}
+        />
+
+        <ReCAPTCHA
+          sitekey={env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
+          ref={recaptchaRef}
         />
 
         <FormField
