@@ -15,7 +15,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "~/components/ui/sidebar";
-import { usePathname } from "~/i18n/navigation";
+import { usePathname, Link } from "~/i18n/navigation";
 
 const data = [
   {
@@ -24,7 +24,7 @@ const data = [
     items: [
       {
         title: "Teams",
-        url: "/admin/teams",
+        url: "/admin/team",
       },
       {
         title: "Project Structure",
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild isActive={isActive}>
-                        <a href={item.url}>{item.title}</a>
+                        <Link href={item.url}>{item.title}</Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
