@@ -84,6 +84,7 @@ model Invite {
     resultsReleased     DateTime?
     resultsReleasedBy   User?     @relation("ResultsReleasedBy", fields: [resultsReleasedById], references: [id]) // optional, wer hat die Ergebnisse freigegeben
     resultsReleasedById String? // optional, wer hat die Ergebnisse freigegeben
+    lastReminderSentAt  DateTime? // optional, wann wurde das letzte Mal eine Erinnerung gesendet
 
     teamId String
     team   Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)

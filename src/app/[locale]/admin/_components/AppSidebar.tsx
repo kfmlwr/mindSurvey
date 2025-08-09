@@ -26,6 +26,10 @@ const data = [
         title: "Teams",
         url: "/admin/team",
       },
+      {
+        title: "Users",
+        url: "/admin/users",
+      },
     ],
   },
 ];

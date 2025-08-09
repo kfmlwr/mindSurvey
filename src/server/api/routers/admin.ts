@@ -402,4 +402,178 @@ export const adminRouter = createTRPCRouter({
         resultsReleased: hasReleasedResults ? new Date() : null,
       };
     }),
+
+  // User management endpoints
+  
+  // Get all users for admin view
+  getAllUsers: protectedProcedure.query(async ({ ctx }) => {
+    requireAdmin(ctx);
+    
+    const users = await ctx.db.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            team: true,
+            invite: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      ownedTeams: user._count.team,
+      invitations: user._count.invite,
+    }));
+  }),
+
+  // Create a new admin user
+  createAdmin: protectedProcedure
+    .input(
+      z.object({
+        email: z
+          .string()
+          .min(1, "Email is required")
+          .email("Please enter a valid email address"),
+        name: z
+          .string()
+          .min(1, "Name is required")
+          .min(2, "Name must be at least 2 characters")
+          .max(100, "Name must be less than 100 characters"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+      
+      // Check if user already exists
+      const existingUser = await ctx.db.user.findUnique({
+        where: { email: input.email.toLowerCase() },
+      });
+
+      if (existingUser) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "A user with this email already exists",
+        });
+      }
+
+      // Create the new admin user
+      const newAdmin = await ctx.db.user.create({
+        data: {
+          email: input.email.toLowerCase(),
+          name: input.name,
+          role: "ADMIN",
+        },
+      });
+
+      return {
+        id: newAdmin.id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+        role: newAdmin.role,
+        createdAt: newAdmin.createdAt,
+      };
+    }),
+
+  // Update user role
+  updateUserRole: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        role: z.enum(["USER", "ADMIN"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+      
+      const user = await ctx.db.user.findUnique({
+        where: { id: input.userId },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      // Prevent admin from removing their own admin role
+      if (user.id === ctx.session.user.id && input.role !== "ADMIN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You cannot remove your own admin role",
+        });
+      }
+
+      const updatedUser = await ctx.db.user.update({
+        where: { id: input.userId },
+        data: { role: input.role },
+      });
+
+      return { success: true, user: updatedUser };
+    }),
+
+  // Delete user (with safety checks)
+  deleteUser: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+      
+      const user = await ctx.db.user.findUnique({
+        where: { id: input.userId },
+        include: {
+          team: true,
+          invite: true,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      // Prevent admin from deleting themselves
+      if (user.id === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You cannot delete your own account",
+        });
+      }
+
+      // Check if user owns teams
+      if (user.team.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot delete user who owns teams. Transfer or delete teams first.",
+        });
+      }
+
+      // Delete user invitations first
+      await ctx.db.invite.deleteMany({
+        where: { userId: input.userId },
+      });
+
+      // Delete the user
+      await ctx.db.user.delete({
+        where: { id: input.userId },
+      });
+
+      return { success: true };
+    }),
 });
