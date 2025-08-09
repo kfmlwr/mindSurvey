@@ -187,25 +187,57 @@ export const teamRouter = createTRPCRouter({
           message: "User already exists",
         });
       }
+
       const token = randomBytes(64).toString("hex");
 
-      const url = `${env.BASE_URL}/${locale}/survey/${token}`;
+      // Count current team members (excluding the leader)
+      const memberCount = team.invitations.filter(
+        (invite) => invite.userId !== team.ownerId
+      ).length;
 
-      const { error } = await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: [input.email],
-        subject: "Invitation to MindClip",
-        react: await InviteMemberEmailTemplate({
-          inviterName: ctx.session.user.email ?? undefined,
-          url,
-        }),
-      });
+      // Only send email invitations once we have at least 5 team members
+      const shouldSendEmail = memberCount >= 4; // Will be 5 after creating this invite
 
-      if (error) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to resend invite",
+      if (shouldSendEmail) {
+        const url = `${env.BASE_URL}/${locale}/survey/${token}`;
+
+        const { error } = await resend.emails.send({
+          from: env.EMAIL_FROM,
+          to: [input.email],
+          subject: "Invitation to MindClip",
+          react: await InviteMemberEmailTemplate({
+            inviterName: ctx.session.user.email ?? undefined,
+            url,
+          }),
         });
+
+        if (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to send invite",
+          });
+        }
+
+        // If this is the 5th member, send emails to all previous members too
+        if (memberCount === 4) {
+          const pendingInvites = team.invitations.filter(
+            (invite) => invite.userId !== team.ownerId && invite.status === "PENDING"
+          );
+
+          for (const pendingInvite of pendingInvites) {
+            const pendingUrl = `${env.BASE_URL}/${locale}/survey/${pendingInvite.inviteToken}`;
+            
+            await resend.emails.send({
+              from: env.EMAIL_FROM,
+              to: [pendingInvite.email],
+              subject: "Invitation to MindClip",
+              react: await InviteMemberEmailTemplate({
+                inviterName: ctx.session.user.email ?? undefined,
+                url: pendingUrl,
+              }),
+            });
+          }
+        }
       }
 
       const invite = await ctx.db.invite.create({
@@ -296,14 +328,20 @@ export const teamRouter = createTRPCRouter({
         (invite) => invite.status === "COMPLETED",
       );
 
+      // Get current user's invite for resultsReleased check
+      const userInvite = invites.find(invite => invite.userId === ctx.session.user.id);
+      
       if (!isAllCompleted) {
         return {
           isAllCompleted: false,
-          results: null,
+          teamAverage: null,
+          userResult: null,
+          resultsReleased: userInvite?.resultsReleased || null,
         };
       }
 
-      const answers = await ctx.db.answer.findMany({
+      // Get all answers for team average
+      const allAnswers = await ctx.db.answer.findMany({
         where: {
           invite: {
             teamId: input.teamId,
@@ -314,11 +352,24 @@ export const teamRouter = createTRPCRouter({
         },
       });
 
-      const result = answers.length > 0 ? calculateResult(answers) : null;
+      // Get current user's answers
+      const userAnswers = userInvite ? await ctx.db.answer.findMany({
+        where: {
+          inviteId: userInvite.id,
+        },
+        include: {
+          pair: true,
+        },
+      }) : [];
+
+      const teamAverage = allAnswers.length > 0 ? calculateResult(allAnswers) : null;
+      const userResult = userAnswers.length > 0 ? calculateResult(userAnswers) : null;
 
       return {
         isAllCompleted: true,
-        results: result,
+        teamAverage,
+        userResult,
+        resultsReleased: userInvite?.resultsReleased || null,
       };
     }),
 

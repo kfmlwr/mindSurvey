@@ -13,11 +13,25 @@ import { Link } from "~/i18n/navigation";
 
 interface ResultCardProps {
   result: { x: number; y: number };
+  teamAverage?: { x: number; y: number } | null;
   teamId: string;
 }
 
-export function ResultCard({ result, teamId }: ResultCardProps) {
+export function ResultCard({ result, teamAverage, teamId }: ResultCardProps) {
   const t = useTranslations("SurveyResult");
+
+  const chartData = [
+    ...(teamAverage ? [{
+      ...teamAverage,
+      label: t("teamAverageLabel"),
+      color: "hsl(var(--primary))"
+    }] : []),
+    {
+      ...result,
+      label: t("yourResultLabel"),
+      color: "hsl(var(--destructive))"
+    }
+  ];
 
   return (
     <motion.div
@@ -41,7 +55,7 @@ export function ResultCard({ result, teamId }: ResultCardProps) {
               </Button>
             </Link>
           </div>
-          <ResultChart data={[result]} />
+          <ResultChart data={chartData} />
         </CardContent>
       </Card>
       <Card>

@@ -97,16 +97,37 @@ export const surveyRouter = createTRPCRouter({
         },
       });
 
-      const result = answers.length > 0 ? calculateResult(answers) : null;
+      const userResult = answers.length > 0 ? calculateResult(answers) : null;
+
+      // Get team average for comparison (only if results are released)
+      let teamAverage = null;
+      if (invite.resultsReleased) {
+        const teamAnswers = await ctx.db.answer.findMany({
+          where: {
+            invite: {
+              teamId: invite.teamId,
+              status: "COMPLETED",
+            },
+          },
+          include: {
+            pair: true,
+          },
+        });
+        teamAverage = teamAnswers.length > 0 ? calculateResult(teamAnswers) : null;
+      }
+
+      const resultsReleased = !!invite.resultsReleased;
 
       return {
-        result,
+        result: resultsReleased ? userResult : null,
+        teamAverage: resultsReleased ? teamAverage : null,
         invite: {
           id: invite.id,
           email: invite.email,
           status: invite.status,
           teamId: invite.teamId,
           name: invite.user?.name ?? "",
+          resultsReleased: invite.resultsReleased,
         },
       };
     }),
@@ -170,16 +191,7 @@ export const surveyRouter = createTRPCRouter({
 
       await ctx.db.answer.createMany({ data: responses });
 
-      const answers = await ctx.db.answer.findMany({
-        where: { inviteId: invite.id },
-        include: {
-          pair: true,
-        },
-      });
-
-      const result = calculateResult(answers);
-
-      return { result };
+      return { success: true };
     }),
 
   isLeader: publicProcedure

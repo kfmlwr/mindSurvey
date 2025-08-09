@@ -50,14 +50,21 @@
       "errorRemovingMember": "Error removing member, please try again.",
       "resendInviteSuccess": "Invitation resent successfully!",
       "resendInviteError": "Failed to resend invite",
-      "resendingInvite": "Resending invite..."
+      "resendingInvite": "Resending invite...",
+      "minimumMembersRequired": "Add at least 5 team members to start sending survey invitations.",
+      "addMoreMembers": "Add {count} more member{plural} to reach the minimum of 5 members before invitations are sent.",
+      "currentMembersCount": "Current members: {current} / 5 minimum required",
+      "minimumReached": "Minimum team size reached. Invitations will be sent automatically."
     },
     "resultsTab": {
       "title": "Your Results",
       "allMembersCompleted": "All team members have completed the survey.",
       "notAllMembersCompleted": "Not all team members have completed the survey.",
       "completedAt": "Completed at {completedAt}",
-      "resultButton": "Results"
+      "resultButton": "Results",
+      "teamAverageLabel": "Team Average",
+      "yourResultLabel": "Your Assessment",
+      "resultsNotReleased": "Results have not yet been released by an administrator."
     }
   },
   "Errors": {
@@ -95,7 +102,11 @@
     "description": "Your survey result is ready.",
     "peerText": "Thanks for completing the survey!",
     "createYourOwn": "Create your own Survey",
-    "toTeam": "Your Team"
+    "toTeam": "Your Team",
+    "pleaseCompleteSurvey": "Please complete the survey before viewing results.",
+    "resultsNotReleased": "Results have not yet been released by an administrator.",
+    "teamAverageLabel": "Team Average",
+    "yourResultLabel": "Your Assessment"
   },
   "LocaleSwitcher": {
     "label": "Change Language",

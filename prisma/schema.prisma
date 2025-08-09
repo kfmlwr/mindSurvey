@@ -44,13 +44,7 @@ model Session {
 
 enum Role {
     USER
-    LEADER
     ADMIN
-}
-
-enum TeamRole {
-    LEADER
-    USER
 }
 
 model User {
@@ -63,10 +57,11 @@ model User {
     sessions      Session[]
     role          Role      @default(USER)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    Team      Team[]
-    Invite    Invite[]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    team            Team[]
+    invite          Invite[] @relation("InviteUser")
+    resultsReleased Invite[] @relation("ResultsReleasedBy")
 }
 
 model Team {
@@ -81,15 +76,18 @@ model Team {
 }
 
 model Invite {
-    id          String    @id @default(cuid())
-    status      Status    @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
-    inviteToken String?   @unique // optional, null nach Einlösung
-    email       String
-    completedAt DateTime?
+    id                  String    @id @default(cuid())
+    status              Status    @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
+    inviteToken         String?   @unique // optional, null nach Einlösung
+    email               String
+    completedAt         DateTime?
+    resultsReleased     DateTime?
+    resultsReleasedBy   User?     @relation("ResultsReleasedBy", fields: [resultsReleasedById], references: [id]) // optional, wer hat die Ergebnisse freigegeben
+    resultsReleasedById String? // optional, wer hat die Ergebnisse freigegeben
 
     teamId String
     team   Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
-    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user   User?   @relation("InviteUser", fields: [userId], references: [id], onDelete: Cascade)
     userId String? // optional, nur Owner sind über User verbunden
 
     createdAt DateTime @default(now())

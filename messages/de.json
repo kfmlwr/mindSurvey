@@ -51,14 +51,21 @@
       "errorRemovingMember": "Fehler beim Entfernen des Mitglieds, bitte versuche es erneut.",
       "resendInviteSuccess": "Einladung erfolgreich erneut gesendet!",
       "resendInviteError": "Fehler beim erneuten Senden der Einladung",
-      "resendingInvite": "Einladung wird erneut gesendet..."
+      "resendingInvite": "Einladung wird erneut gesendet...",
+      "minimumMembersRequired": "Füge mindestens 5 Teammitglieder hinzu, um Umfrage-Einladungen zu versenden.",
+      "addMoreMembers": "Füge {count} weitere{plural} Mitglied{plural} hinzu, um die Mindestanzahl von 5 Mitgliedern zu erreichen, bevor Einladungen versendet werden.",
+      "currentMembersCount": "Aktuelle Mitglieder: {current} / 5 mindestens erforderlich",
+      "minimumReached": "Mindest-Teamgröße erreicht. Einladungen werden automatisch versendet."
     },
     "resultsTab": {
       "title": "Team Ergebnisse",
       "allMembersCompleted": "Alle Teammitglieder haben die Umfrage abgeschlossen.",
       "notAllMembersCompleted": "Nicht alle Teammitglieder haben die Umfrage abgeschlossen.",
       "completedAt": "Abgeschlossen am {completedAt}",
-      "resultButton": "Ergebnisse"
+      "resultButton": "Ergebnisse",
+      "teamAverageLabel": "Team Durchschnitt",
+      "yourResultLabel": "Deine Einschätzung",
+      "resultsNotReleased": "Die Ergebnisse wurden noch nicht von einem Administrator freigegeben."
     }
   },
   "Errors": {
@@ -96,7 +103,11 @@
     "description": "Dein Umfrageergebnis ist bereit.",
     "peerText": "Danke, dass du die Umfrage abgeschlossen hast!",
     "createYourOwn": "Erstelle deine eigene Umfrage",
-    "toTeam": "Dein Team"
+    "toTeam": "Dein Team",
+    "pleaseCompleteSurvey": "Bitte schließe die Umfrage ab, bevor du die Ergebnisse ansiehst.",
+    "resultsNotReleased": "Die Ergebnisse wurden noch nicht von einem Administrator freigegeben.",
+    "teamAverageLabel": "Team Durchschnitt",
+    "yourResultLabel": "Deine Einschätzung"
   },
   "LocaleSwitcher": {
     "label": "Sprache ändern",

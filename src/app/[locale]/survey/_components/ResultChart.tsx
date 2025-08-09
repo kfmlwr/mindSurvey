@@ -10,6 +10,7 @@ import {
   ScatterChart,
   XAxis,
   YAxis,
+  LabelList,
 } from "recharts";
 import {
   ChartContainer,
@@ -20,6 +21,8 @@ import {
 export interface Point {
   x: number;
   y: number;
+  label?: string;
+  color?: string;
 }
 
 const chartConfig = {
@@ -71,6 +74,39 @@ function QuadrantLabels({ width, height }: { width: number; height: number }) {
   );
 }
 
+function PointLabels({ data }: { data?: Point[] }) {
+  if (!data) return null;
+  
+  return (
+    <>
+      {data.map((point, index) => {
+        if (!point.label) return null;
+        
+        // Convert domain values (-5 to 5) to chart coordinates
+        // Assuming chart width/height are available in the parent context
+        const xPercent = ((point.x + 5) / 10) * 100;
+        const yPercent = ((5 - point.y) / 10) * 100; // Inverted because SVG y grows downward
+        
+        return (
+          <text
+            key={index}
+            x={`${xPercent}%`}
+            y={`${yPercent}%`}
+            dx={10}
+            dy={-10}
+            fontSize={12}
+            fontWeight="bold"
+            fill={point.color || "var(--foreground)"}
+            textAnchor="start"
+          >
+            {point.label}
+          </text>
+        );
+      })}
+    </>
+  );
+}
+
 interface ResultChartProps {
   data?: Point[];
 }
@@ -107,8 +143,25 @@ export function ResultChart({ data }: ResultChartProps) {
         />
 
         <Customized component={QuadrantLabels as any} />
-        {/* Punkte */}
-        <Scatter name="points" data={data} fill="var(--color-chart-1)" />
+        <Customized component={() => <PointLabels data={data} />} />
+        {/* Team Average Points */}
+        <Scatter 
+          name="team"
+          data={data?.filter(point => point.color === "hsl(var(--primary))")?.map(point => ({ x: point.x, y: point.y }))} 
+          fill="hsl(var(--primary))" 
+        />
+        {/* User Points */}
+        <Scatter 
+          name="user"
+          data={data?.filter(point => point.color === "hsl(var(--destructive))")?.map(point => ({ x: point.x, y: point.y }))} 
+          fill="hsl(var(--destructive))" 
+        />
+        {/* Default Points */}
+        <Scatter 
+          name="points" 
+          data={data?.filter(point => !point.color)?.map(point => ({ x: point.x, y: point.y }))} 
+          fill="var(--color-chart-1)" 
+        />
       </ScatterChart>
     </ChartContainer>
   );
