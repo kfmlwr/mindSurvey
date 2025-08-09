@@ -149,7 +149,9 @@
     "deleteConfirm": "Delete Team",
     "deletingTeam": "Deleting team...",
     "teamDeletedSuccess": "Team deleted successfully!",
-    "teamDeletedError": "Error deleting team: {error}"
+    "teamDeletedError": "Error deleting team: {error}",
+    "viewResults": "View Results",
+    "viewTeamResults": "Team Results - {teamName}"
   },
   "LocaleSwitcher": {
     "label": "Change Language",

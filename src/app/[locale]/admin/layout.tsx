@@ -7,6 +7,7 @@ import {
 import { AppSidebar } from "./_components/AppSidebar";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import Breadcrumbs from "./_components/Breadcrumbs";
+import LocaleSwitch from "~/components/LanguageSwitch";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -23,7 +24,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <Breadcrumbs />
           </div>
-          <div>
+          <div className="flex items-center gap-2">
+            <LocaleSwitch />
             <ThemeToggle />
           </div>
         </header>

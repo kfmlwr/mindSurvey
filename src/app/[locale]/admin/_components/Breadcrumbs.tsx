@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import React from "react";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,8 +16,6 @@ const labelMap: Record<string, string> = {
 };
 
 const LOCALES = ["en", "de"];
-
-// Konfigurierbarer Base Path
 const BASE_PATH = "/admin";
 
 function formatSegment(seg: string) {
@@ -34,29 +31,32 @@ function formatSegment(seg: string) {
 export default function Breadcrumbs() {
   const pathname = usePathname();
 
-  // 1. Base Path entfernen
-  const pathWithoutBase = pathname.startsWith(BASE_PATH)
-    ? pathname.slice(BASE_PATH.length)
-    : pathname;
-
-  // 2. Segmente filtern: leer + Locale entfernen
-  const segments = pathWithoutBase
+  // 1. Locale entfernen
+  const withoutLocale = pathname
     .split("/")
     .filter(Boolean)
     .filter((seg) => !LOCALES.includes(seg));
 
-  let cumulativePath = BASE_PATH; // Links immer mit Base Path aufbauen
+  // 2. Admin-Teil für Anzeige entfernen
+  const displaySegments =
+    withoutLocale[0] === BASE_PATH.slice(1)
+      ? withoutLocale.slice(1) // "admin" raus
+      : withoutLocale;
+
+  // 3. Admin-Teil für Links behalten
+  let cumulativePath = BASE_PATH;
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
+        {/* Home-Link immer zum Base Path */}
         <BreadcrumbItem>
           <BreadcrumbLink href={BASE_PATH}>Home</BreadcrumbLink>
         </BreadcrumbItem>
 
-        {segments.map((seg, idx) => {
+        {displaySegments.map((seg, idx) => {
           cumulativePath += `/${seg}`;
-          const isLast = idx === segments.length - 1;
+          const isLast = idx === displaySegments.length - 1;
           const label = formatSegment(seg);
 
           return (

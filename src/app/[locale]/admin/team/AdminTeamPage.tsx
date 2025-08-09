@@ -30,6 +30,7 @@ import {
   AlertCircle,
   Trash2,
   MoreHorizontal,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -37,6 +38,7 @@ import { useTRPC, type RouterOutputs } from "~/trpc/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React from "react";
 import CreateTeamDialog from "./CreateTeamDialog";
+import AdminTeamResultsDialog from "./AdminTeamResultsDialog";
 
 type TeamData = RouterOutputs["admin"]["getAllTeams"][number];
 
@@ -52,6 +54,9 @@ export default function TeamAdminPage({ teams }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<string | null>(
     null,
   );
+  const [viewResultsDialogOpen, setViewResultsDialogOpen] = React.useState<
+    string | null
+  >(null);
 
   const trpc = useTRPC();
 
@@ -167,7 +172,7 @@ export default function TeamAdminPage({ teams }: Props) {
         return (
           <div className="flex items-center gap-2">
             {hasUnreleased ? (
-              <Clock className="h-4 w-4 text-orange-500" />
+              <Clock className="text-destructive h-4 w-4" />
             ) : (
               <CheckCircle className="h-4 w-4 text-green-500" />
             )}
@@ -175,7 +180,7 @@ export default function TeamAdminPage({ teams }: Props) {
               {released}/{completed}
             </span>
             {hasUnreleased && (
-              <Badge variant="outline" className="text-orange-600">
+              <Badge variant="outline" className="text-destructive">
                 {t("pending")}
               </Badge>
             )}
@@ -212,6 +217,14 @@ export default function TeamAdminPage({ teams }: Props) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {team.completedSurveys === team.memberCount && (
+                <DropdownMenuItem
+                  onClick={() => setViewResultsDialogOpen(team.id)}
+                >
+                  <Eye className="h-4 w-4" />
+                  {t("viewResults")}
+                </DropdownMenuItem>
+              )}
               {hasUnreleasedResults && (
                 <DropdownMenuItem
                   onClick={() => setReleaseDialogOpen(team.id)}
@@ -329,6 +342,13 @@ export default function TeamAdminPage({ teams }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* View Results Dialog */}
+      <AdminTeamResultsDialog
+        teamId={viewResultsDialogOpen}
+        open={!!viewResultsDialogOpen}
+        onOpenChange={() => setViewResultsDialogOpen(null)}
+      />
     </div>
   );
 }

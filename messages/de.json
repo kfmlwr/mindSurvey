@@ -150,7 +150,9 @@
     "deleteConfirm": "Team löschen",
     "deletingTeam": "Team wird gelöscht...",
     "teamDeletedSuccess": "Team erfolgreich gelöscht!",
-    "teamDeletedError": "Fehler beim Löschen des Teams: {error}"
+    "teamDeletedError": "Fehler beim Löschen des Teams: {error}",
+    "viewResults": "Ergebnisse anzeigen",
+    "viewTeamResults": "Team Ergebnisse - {teamName}"
   },
   "LocaleSwitcher": {
     "label": "Sprache ändern",
