@@ -3,6 +3,11 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { randomBytes } from "crypto";
 import { calculateResult } from "~/lib/calculateResult";
+import { Resend } from "resend";
+import { env } from "~/env";
+import { ResultsReleasedEmailTemplate } from "~/server/emails/ResultsReleasedEmail";
+
+const resend = new Resend(env.AUTH_RESEND_KEY);
 
 const createTeamSchema = z.object({
   name: z
@@ -187,39 +192,6 @@ export const adminRouter = createTRPCRouter({
     }));
   }),
 
-  // Release results for a specific team member
-  releaseResults: protectedProcedure
-    .input(
-      z.object({
-        inviteId: z.string(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      requireAdmin(ctx);
-      const invite = await ctx.db.invite.findUnique({
-        where: { id: input.inviteId },
-        include: { team: true },
-      });
-
-      if (!invite) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Invite not found",
-        });
-      }
-
-      // Update the invite to release results
-      await ctx.db.invite.update({
-        where: { id: input.inviteId },
-        data: {
-          resultsReleased: new Date(),
-          resultsReleasedById: ctx.session.user.id,
-        },
-      });
-
-      return { success: true };
-    }),
-
   // Release results for all members of a team
   releaseTeamResults: protectedProcedure
     .input(
@@ -231,7 +203,10 @@ export const adminRouter = createTRPCRouter({
       requireAdmin(ctx);
       const team = await ctx.db.team.findUnique({
         where: { id: input.teamId },
-        include: { invitations: true },
+        include: {
+          invitations: true,
+          owner: true,
+        },
       });
 
       if (!team) {
@@ -252,6 +227,28 @@ export const adminRouter = createTRPCRouter({
           resultsReleasedById: ctx.session.user.id,
         },
       });
+
+      // Send email notification to team owner
+      try {
+        const teamResultsUrl = `${env.BASE_URL}/team/${input.teamId}`;
+
+        await resend.emails.send({
+          from: env.EMAIL_FROM,
+          to: team.owner.email ?? "",
+          subject: `Team Survey Results Released - ${team.name}`,
+          react: ResultsReleasedEmailTemplate({
+            teamName: team.name,
+            teamOwnerName: team.owner.name ?? "Team Leader",
+            url: teamResultsUrl,
+          }) as any,
+        });
+      } catch (emailError) {
+        console.error(
+          "Failed to send team results released email:",
+          emailError,
+        );
+        // Don't fail the mutation if email fails
+      }
 
       return { success: true };
     }),
@@ -404,11 +401,11 @@ export const adminRouter = createTRPCRouter({
     }),
 
   // User management endpoints
-  
+
   // Get all users for admin view
   getAllUsers: protectedProcedure.query(async ({ ctx }) => {
     requireAdmin(ctx);
-    
+
     const users = await ctx.db.user.findMany({
       select: {
         id: true,
@@ -454,11 +451,11 @@ export const adminRouter = createTRPCRouter({
           .min(1, "Name is required")
           .min(2, "Name must be at least 2 characters")
           .max(100, "Name must be less than 100 characters"),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       requireAdmin(ctx);
-      
+
       // Check if user already exists
       const existingUser = await ctx.db.user.findUnique({
         where: { email: input.email.toLowerCase() },
@@ -495,11 +492,11 @@ export const adminRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         role: z.enum(["USER", "ADMIN"]),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       requireAdmin(ctx);
-      
+
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
       });
@@ -532,7 +529,7 @@ export const adminRouter = createTRPCRouter({
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       requireAdmin(ctx);
-      
+
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
         include: {
@@ -560,7 +557,8 @@ export const adminRouter = createTRPCRouter({
       if (user.team.length > 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Cannot delete user who owns teams. Transfer or delete teams first.",
+          message:
+            "Cannot delete user who owns teams. Transfer or delete teams first.",
         });
       }
 

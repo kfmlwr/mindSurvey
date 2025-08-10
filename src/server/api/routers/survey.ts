@@ -119,13 +119,14 @@ export const surveyRouter = createTRPCRouter({
       const resultsReleased = !!invite.resultsReleased;
 
       return {
-        result: resultsReleased ? userResult : null,
-        teamAverage: resultsReleased ? teamAverage : null,
+        result: invite.userId ? userResult : null, // Only return result if invite has connected user
+        teamAverage: resultsReleased ? teamAverage : null, // Only return team average when released
         invite: {
           id: invite.id,
           email: invite.email,
           status: invite.status,
           teamId: invite.teamId,
+          userId: invite.userId,
           name: invite.user?.name ?? "",
           resultsReleased: invite.resultsReleased,
         },

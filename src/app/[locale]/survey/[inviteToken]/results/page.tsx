@@ -15,7 +15,6 @@ export default async function Page({ params }: PageProps) {
     inviteToken,
   });
 
-  const isLeader = await api.survey.isLeader({ inviteToken });
   const t = await getTranslations("SurveyResult");
 
   // Check if survey is completed
@@ -24,33 +23,29 @@ export default async function Page({ params }: PageProps) {
       <div className="flex min-h-screen items-center justify-center p-6">
         <div className="mx-auto w-full max-w-2xl">
           <Alert variant="destructive">
-            <AlertDescription>
-              {t("pleaseCompleteSurvey")}
-            </AlertDescription>
+            <AlertDescription>{t("pleaseCompleteSurvey")}</AlertDescription>
           </Alert>
         </div>
       </div>
     );
   }
 
-  // If user is team leader
-  if (isLeader.isLeader) {
-    // Check if results are released
+  // If invite has a connected user (team leader), show results
+  if (surveyStatus.invite.userId) {
+    // Check if results are released for team average
     if (!surveyStatus.invite.resultsReleased) {
       return (
         <div className="flex min-h-screen items-center justify-center p-6">
           <div className="mx-auto w-full max-w-2xl">
             <Alert variant="destructive">
-              <AlertDescription>
-                {t("resultsNotReleased")}
-              </AlertDescription>
+              <AlertDescription>{t("resultsNotReleased")}</AlertDescription>
             </Alert>
           </div>
         </div>
       );
     }
 
-    // Show results for team leader
+    // Show results for user with connected account
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <div className="mx-auto w-full max-w-2xl">
@@ -66,7 +61,7 @@ export default async function Page({ params }: PageProps) {
     );
   }
 
-  // For regular team members - show peer results card
+  // For invites without connected user - show peer results card
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="mx-auto w-full max-w-2xl">
