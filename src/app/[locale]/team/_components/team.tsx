@@ -1,9 +1,17 @@
 "use client";
 
-import { Loader2, Mail, MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  Mail,
+  MoreHorizontal,
+  Trash2,
+  Info,
+  CheckCircle,
+} from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 
 import {
   DropdownMenu,
@@ -39,6 +47,8 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
       },
     ),
   );
+
+  const memberCount = data?.length || 0;
 
   const inviteMutation = useMutation(
     trpc.team.inviteMember.mutationOptions({
@@ -116,6 +126,26 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
       {/* Add members section */}
       <div>
         <h2 className="mb-4 text-xl font-semibold">{t("title")}</h2>
+
+        {/* Minimum members requirement info */}
+        {memberCount < 5 && (
+          <Alert className="mb-4">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              {memberCount === 0
+                ? t("minimumMembersRequired")
+                : t("addMoreMembers", { 
+                    count: 5 - memberCount,
+                    plural: 5 - memberCount === 1 ? "" : "s"
+                  })}
+              <br />
+              <span className="text-muted-foreground text-xs">
+                {t("currentMembersCount", { current: memberCount })}
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="flex gap-2">
           <Input
             type="email"
@@ -134,6 +164,15 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
             {t("invite")}
           </Button>
         </div>
+
+        {memberCount >= 5 && (
+          <Alert className="mt-4 border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              {t("minimumReached")}
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {/* Your team section */}
