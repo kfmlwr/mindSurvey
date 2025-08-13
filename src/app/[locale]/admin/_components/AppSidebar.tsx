@@ -1,11 +1,13 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import * as React from "react";
 import { Logo } from "~/components/Logo";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -16,6 +18,7 @@ import {
   SidebarRail,
 } from "~/components/ui/sidebar";
 import { usePathname, Link } from "~/i18n/navigation";
+import { logoutAction } from "./logout-action";
 
 const data = [
   {
@@ -27,7 +30,7 @@ const data = [
         url: "/admin/team",
       },
       {
-        title: "Users",
+        title: "Admins",
         url: "/admin/users",
       },
     ],
@@ -65,6 +68,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-foreground/60 uppercase">
+            Account
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <form action={logoutAction}>
+                  <SidebarMenuButton type="submit" className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Abmelden
+                  </SidebarMenuButton>
+                </form>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

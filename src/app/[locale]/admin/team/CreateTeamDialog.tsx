@@ -28,45 +28,57 @@ import { useTRPC } from "~/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 
-const createTeamSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Team name is required")
-    .min(2, "Team name must be at least 2 characters")
-    .max(50, "Team name must be less than 50 characters"),
-  ownerEmail: z
-    .string()
-    .min(1, "Owner email is required")
-    .email("Please enter a valid email address"),
-  members: z
-    .array(
-      z.object({
-        email: z
-          .string()
-          .min(1, "Member email is required")
-          .email("Please enter a valid email address"),
-      })
-    )
-    .min(5, "At least 5 team members are required (in addition to the owner)")
-    .refine(
-      (members) => {
-        const emails = members.map((m) => m.email.toLowerCase()).filter(email => email.trim());
-        const uniqueEmails = new Set(emails);
-        return uniqueEmails.size === emails.length;
-      },
-      { message: "All member emails must be unique" }
-    ),
-}).refine(
-  (data) => {
-    const ownerEmail = data.ownerEmail.toLowerCase();
-    const memberEmails = data.members.map((m) => m.email.toLowerCase()).filter(email => email.trim());
-    return !memberEmails.includes(ownerEmail);
-  },
-  {
-    message: "Owner email cannot be the same as any team member email",
-    path: ["members"],
-  }
-);
+const createTeamSchema = z
+  .object({
+    name: z.string().min(1, "Team name is required").min(2).max(50),
+    ownerEmail: z.string().min(1, "Owner email is required").email(),
+    members: z
+      .array(
+        z.object({
+          email: z.string().min(1, "Member email is required").email(),
+        }),
+      )
+      .min(
+        5,
+        "At least 5 team members are required (in addition to the owner)",
+      ),
+  })
+  .superRefine((data, ctx) => {
+    const owner = data.ownerEmail.trim().toLowerCase();
+    const emails = data.members.map((m) => m.email.trim().toLowerCase());
+
+    // Owner darf nicht in Members sein
+    emails.forEach((e, i) => {
+      if (e && e === owner) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["members", i, "email"],
+          message: "Owner email cannot be the same as any team member email",
+        });
+      }
+    });
+
+    // Member-Emails müssen unique sein
+    const seen = new Map<string, number>();
+    emails.forEach((e, i) => {
+      if (!e) return;
+      if (seen.has(e)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["members", i, "email"],
+          message: "All member emails must be unique",
+        });
+        const firstIndex = seen.get(e)!;
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["members", firstIndex, "email"],
+          message: "All member emails must be unique",
+        });
+      } else {
+        seen.set(e, i);
+      }
+    });
+  });
 
 type CreateTeamFormData = z.infer<typeof createTeamSchema>;
 
@@ -97,12 +109,14 @@ export default function CreateTeamDialog() {
     name: "members",
   });
 
+  const queryKey = trpc.admin.getAllTeams.queryKey();
+
   const createTeam = useMutation(
     trpc.admin.createTeam.mutationOptions({
       onSuccess: () => {
         // Invalidate and refetch teams
         void queryClient.invalidateQueries({
-          queryKey: ["admin.getAllTeams"],
+          queryKey: queryKey,
         });
         form.reset();
         setIsOpen(false);
@@ -128,7 +142,7 @@ export default function CreateTeamDialog() {
           {t("createTeam")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{t("createTeamTitle")}</DialogTitle>
           <DialogDescription>{t("createTeamDescription")}</DialogDescription>
@@ -181,8 +195,8 @@ export default function CreateTeamDialog() {
                   {t("addMember")}
                 </Button>
               </div>
-              
-              <div className="text-sm text-muted-foreground">
+
+              <div className="text-muted-foreground text-sm">
                 {t("minimumMembersNote")}
               </div>
 
@@ -197,7 +211,9 @@ export default function CreateTeamDialog() {
                           <FormControl>
                             <Input
                               type="email"
-                              placeholder={t("memberEmailPlaceholder", { index: index + 1 })}
+                              placeholder={t("memberEmailPlaceholder", {
+                                index: index + 1,
+                              })}
                               {...field}
                             />
                           </FormControl>
@@ -219,9 +235,9 @@ export default function CreateTeamDialog() {
                   </div>
                 ))}
               </div>
-              
+
               {form.formState.errors.members && (
-                <div className="text-sm text-destructive">
+                <div className="text-destructive text-sm">
                   {form.formState.errors.members.message}
                 </div>
               )}

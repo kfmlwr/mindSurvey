@@ -87,6 +87,7 @@ export const adminRouter = createTRPCRouter({
         data: {
           name: input.name,
           ownerId: ownerUser.id,
+          createdById: ctx.session.user.id,
         },
       });
 
@@ -104,27 +105,12 @@ export const adminRouter = createTRPCRouter({
       const memberInvites = [];
 
       for (const memberData of input.members) {
-        // Skip empty emails
         if (!memberData.email.trim()) continue;
-
-        let memberUser = await ctx.db.user.findUnique({
-          where: { email: memberData.email },
-        });
-
-        if (!memberUser) {
-          memberUser = await ctx.db.user.create({
-            data: {
-              email: memberData.email,
-              name: memberData.email.split("@")[0],
-            },
-          });
-        }
 
         const invite = await ctx.db.invite.create({
           data: {
-            email: memberUser.email ?? memberData.email,
+            email: memberData.email,
             teamId: team.id,
-            userId: memberUser.id,
             inviteToken: randomBytes(64).toString("hex"),
           },
         });
@@ -163,11 +149,22 @@ export const adminRouter = createTRPCRouter({
             invitations: true,
           },
         },
+        tagsOnTeam: {
+          select: {
+            tag: {
+              select: {
+                id: true,
+                label: true,
+                color: true,
+              },
+            },
+            assignedAt: true,
+          },
+        },
         invitations: {
           select: {
             id: true,
             status: true,
-            resultsReleased: true,
           },
         },
       },
@@ -182,13 +179,17 @@ export const adminRouter = createTRPCRouter({
       createdAt: team.createdAt,
       updatedAt: team.updatedAt,
       owner: team.owner,
+      isResultsReleased: team.resultsReleased !== null,
       memberCount: team._count.invitations,
       completedSurveys: team.invitations.filter(
         (invite) => invite.status === "COMPLETED",
       ).length,
-      releasedResults: team.invitations.filter(
-        (invite) => invite.resultsReleased !== null,
-      ).length,
+      tags: team.tagsOnTeam.map((tag) => ({
+        id: tag.tag.id,
+        label: tag.tag.label,
+        color: tag.tag.color,
+        assignedAt: tag.assignedAt,
+      })),
     }));
   }),
 
@@ -217,11 +218,8 @@ export const adminRouter = createTRPCRouter({
       }
 
       // Update all completed invites to release results
-      await ctx.db.invite.updateMany({
-        where: {
-          teamId: input.teamId,
-          status: "COMPLETED",
-        },
+      await ctx.db.team.update({
+        where: { id: input.teamId },
         data: {
           resultsReleased: new Date(),
           resultsReleasedById: ctx.session.user.id,
@@ -336,7 +334,6 @@ export const adminRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  // Get team results for admin view (similar to team.getTeamResults but without ownership check)
   getTeamResults: protectedProcedure
     .input(z.object({ teamId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -363,15 +360,6 @@ export const adminRouter = createTRPCRouter({
         (invite) => invite.status === "COMPLETED",
       );
 
-      if (!isAllCompleted) {
-        return {
-          isAllCompleted: false,
-          teamAverage: null,
-          userResult: null,
-          resultsReleased: null,
-        };
-      }
-
       // Get all answers for team average
       const allAnswers = await ctx.db.answer.findMany({
         where: {
@@ -387,16 +375,11 @@ export const adminRouter = createTRPCRouter({
       const teamAverage =
         allAnswers.length > 0 ? calculateResult(allAnswers) : null;
 
-      // Check if any results have been released (for display purposes)
-      const hasReleasedResults = invites.some(
-        (invite) => invite.resultsReleased !== null,
-      );
-
       return {
-        isAllCompleted: true,
+        isAllCompleted: isAllCompleted,
         teamAverage,
-        userResult: null, // Don't show individual results in admin view
-        resultsReleased: hasReleasedResults ? new Date() : null,
+        userResult: null,
+        resultsReleased: new Date(),
       };
     }),
 
@@ -416,10 +399,13 @@ export const adminRouter = createTRPCRouter({
         updatedAt: true,
         _count: {
           select: {
-            team: true,
+            teams: true,
             invite: true,
           },
         },
+      },
+      where: {
+        role: "ADMIN",
       },
       orderBy: {
         createdAt: "desc",
@@ -433,7 +419,7 @@ export const adminRouter = createTRPCRouter({
       role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      ownedTeams: user._count.team,
+      ownedTeams: user._count.teams,
       invitations: user._count.invite,
     }));
   }),
@@ -524,6 +510,97 @@ export const adminRouter = createTRPCRouter({
       return { success: true, user: updatedUser };
     }),
 
+  // Update team details
+  updateTeam: protectedProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+        name: z
+          .string()
+          .min(1, "Team name is required")
+          .min(2, "Team name must be at least 2 characters")
+          .max(50, "Team name must be less than 50 characters"),
+        ownerEmail: z
+          .string()
+          .min(1, "Owner email is required")
+          .email("Please enter a valid email address"),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+
+      const team = await ctx.db.team.findUnique({
+        where: { id: input.teamId },
+        include: {
+          owner: true,
+        },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+
+      // Check if new owner email is different from current owner
+      let newOwnerId = team.ownerId;
+      if (input.ownerEmail !== team.owner?.email) {
+        // Find or create the new owner user
+        let newOwner = await ctx.db.user.findUnique({
+          where: { email: input.ownerEmail },
+        });
+
+        if (!newOwner) {
+          newOwner = await ctx.db.user.create({
+            data: {
+              email: input.ownerEmail,
+              name: input.ownerEmail.split("@")[0],
+            },
+          });
+        }
+
+        newOwnerId = newOwner.id;
+
+        // Update the owner invite if it exists
+        await ctx.db.invite.updateMany({
+          where: {
+            teamId: input.teamId,
+            userId: team.ownerId,
+          },
+          data: {
+            email: input.ownerEmail,
+            userId: newOwner.id,
+          },
+        });
+      }
+
+      // Update the team
+      const updatedTeam = await ctx.db.team.update({
+        where: { id: input.teamId },
+        data: {
+          name: input.name,
+          ownerId: newOwnerId,
+        },
+        include: {
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      return {
+        id: updatedTeam.id,
+        name: updatedTeam.name,
+        updatedAt: updatedTeam.updatedAt,
+        owner: updatedTeam.owner,
+      };
+    }),
+
   // Delete user (with safety checks)
   deleteUser: protectedProcedure
     .input(z.object({ userId: z.string() }))
@@ -533,7 +610,7 @@ export const adminRouter = createTRPCRouter({
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
         include: {
-          team: true,
+          teams: true,
           invite: true,
         },
       });
@@ -554,7 +631,7 @@ export const adminRouter = createTRPCRouter({
       }
 
       // Check if user owns teams
-      if (user.team.length > 0) {
+      if (user.teams.length > 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message:

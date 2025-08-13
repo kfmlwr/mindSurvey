@@ -152,7 +152,15 @@
     "teamDeletedSuccess": "Team erfolgreich gelöscht!",
     "teamDeletedError": "Fehler beim Löschen des Teams: {error}",
     "viewResults": "Ergebnisse anzeigen",
-    "viewTeamResults": "Team Ergebnisse - {teamName}"
+    "viewTeamResults": "Team Ergebnisse - {teamName}",
+    "tags": "Tags",
+    "editTeam": "Team bearbeiten",
+    "updateTeamTitle": "Team bearbeiten",
+    "updateTeamDescription": "Bearbeite die Details des Teams.",
+    "updateTeamSubmit": "Team aktualisieren",
+    "updatingTeam": "Team wird aktualisiert...",
+    "teamUpdatedSuccess": "Team erfolgreich aktualisiert!",
+    "teamUpdatedError": "Fehler beim Aktualisieren des Teams: {error}"
   },
   "AdminUsers": {
     "usersOverview": "Benutzer-Übersicht",

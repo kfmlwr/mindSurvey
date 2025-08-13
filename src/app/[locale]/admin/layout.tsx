@@ -8,13 +8,28 @@ import { AppSidebar } from "./_components/AppSidebar";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import Breadcrumbs from "./_components/Breadcrumbs";
 import LocaleSwitch from "~/components/LanguageSwitch";
+import { auth } from "~/server/auth";
+import { redirect } from "~/i18n/navigation";
+import { getLocale } from "next-intl/server";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+
+  const locale = await getLocale();
+
+  if (!session) {
+    return redirect({ href: "/auth/login", locale });
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
+        <header className="items-cnter flex h-16 shrink-0 justify-between border-b px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator

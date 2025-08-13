@@ -151,7 +151,15 @@
     "teamDeletedSuccess": "Team deleted successfully!",
     "teamDeletedError": "Error deleting team: {error}",
     "viewResults": "View Results",
-    "viewTeamResults": "Team Results - {teamName}"
+    "viewTeamResults": "Team Results - {teamName}",
+    "tags": "Tags",
+    "editTeam": "Edit Team",
+    "updateTeamTitle": "Edit Team",
+    "updateTeamDescription": "Edit the team details.",
+    "updateTeamSubmit": "Update Team",
+    "updatingTeam": "Updating team...",
+    "teamUpdatedSuccess": "Team updated successfully!",
+    "teamUpdatedError": "Error updating team: {error}"
   },
   "AdminUsers": {
     "usersOverview": "Users Overview",

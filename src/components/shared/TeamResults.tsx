@@ -24,8 +24,14 @@ interface Props {
   showUserResult?: boolean;
 }
 
-export function TeamResults({ data, translations, showUserResult = true }: Props) {
+export function TeamResults({
+  data,
+  translations,
+  showUserResult = true,
+}: Props) {
   const chartData: Point[] = [];
+
+  console.log("TeamResults data:", data);
 
   // Add team average if available
   if (data.teamAverage) {
@@ -46,7 +52,7 @@ export function TeamResults({ data, translations, showUserResult = true }: Props
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6">
+    <div className="flex h-full flex-col space-y-6">
       {/* Completion status */}
       {data.isAllCompleted ? (
         <Alert>
@@ -68,7 +74,7 @@ export function TeamResults({ data, translations, showUserResult = true }: Props
         </Alert>
       ) : (
         chartData.length > 0 && (
-          <div className="flex-1 min-h-0">
+          <div className="min-h-0 flex-1">
             <ResultChart data={chartData} />
           </div>
         )

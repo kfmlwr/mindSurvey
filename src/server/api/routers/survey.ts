@@ -90,6 +90,17 @@ export const surveyRouter = createTRPCRouter({
         });
       }
 
+      const team = await ctx.db.team.findUnique({
+        where: { id: invite.teamId },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+
       const answers = await ctx.db.answer.findMany({
         where: { inviteId: invite.id },
         include: {
@@ -101,7 +112,7 @@ export const surveyRouter = createTRPCRouter({
 
       // Get team average for comparison (only if results are released)
       let teamAverage = null;
-      if (invite.resultsReleased) {
+      if (team?.resultsReleased) {
         const teamAnswers = await ctx.db.answer.findMany({
           where: {
             invite: {
@@ -113,10 +124,11 @@ export const surveyRouter = createTRPCRouter({
             pair: true,
           },
         });
-        teamAverage = teamAnswers.length > 0 ? calculateResult(teamAnswers) : null;
+        teamAverage =
+          teamAnswers.length > 0 ? calculateResult(teamAnswers) : null;
       }
 
-      const resultsReleased = !!invite.resultsReleased;
+      const resultsReleased = !!team.resultsReleased;
 
       return {
         result: invite.userId ? userResult : null, // Only return result if invite has connected user
@@ -128,7 +140,7 @@ export const surveyRouter = createTRPCRouter({
           teamId: invite.teamId,
           userId: invite.userId,
           name: invite.user?.name ?? "",
-          resultsReleased: invite.resultsReleased,
+          resultsReleased: team.resultsReleased,
         },
       };
     }),

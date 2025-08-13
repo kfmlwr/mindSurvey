@@ -44,16 +44,16 @@ export default function AdminTeamResultsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col">
+      <DialogContent className="flex h-[80vh] flex-col sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>
             {t("viewTeamResults", { teamName: teamDetails?.name || "" })}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0">
+        <div className="min-h-0 flex-1">
           {isLoading ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex h-full items-center justify-center">
               <div>Loading results...</div>
             </div>
           ) : results ? (

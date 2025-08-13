@@ -59,32 +59,62 @@ model User {
 
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
-    team            Team[]
     invite          Invite[] @relation("InviteUser")
-    resultsReleased Invite[] @relation("ResultsReleasedBy")
+    releasedResults Team[]   @relation("ResultsReleasedBy")
+    teams           Team[]   @relation("TeamOwner")
+    createdTeams    Team[]   @relation("createdBy")
+}
+
+model Tag {
+    id          String        @id @default(cuid())
+    label       String        @unique
+    color       String? // optional, hex color code
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    tagsOnTeams TagsOnTeams[]
+}
+
+model TagsOnTeams {
+    team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+    teamId String
+
+    tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+    tagId String
+
+    assignedAt DateTime @default(now())
+
+    @@id([teamId, tagId])
 }
 
 model Team {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    name      String
-    ownerId   String
+    id String @id @default(cuid())
 
-    owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-    invitations Invite[]
-}
+    name String
 
-model Invite {
-    id                  String    @id @default(cuid())
-    status              Status    @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
-    inviteToken         String?   @unique // optional, null nach Einlösung
-    email               String
-    completedAt         DateTime?
     resultsReleased     DateTime?
     resultsReleasedBy   User?     @relation("ResultsReleasedBy", fields: [resultsReleasedById], references: [id]) // optional, wer hat die Ergebnisse freigegeben
     resultsReleasedById String? // optional, wer hat die Ergebnisse freigegeben
-    lastReminderSentAt  DateTime? // optional, wann wurde das letzte Mal eine Erinnerung gesendet
+
+    owner   User   @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+    ownerId String
+
+    invitations Invite[]
+
+    updatedAt   DateTime      @updatedAt
+    createdAt   DateTime      @default(now())
+    createdBy   User?         @relation("createdBy", fields: [createdById], references: [id], onDelete: Cascade)
+    createdById String?
+    tagsOnTeam  TagsOnTeams[]
+}
+
+model Invite {
+    id          String    @id @default(cuid())
+    status      Status    @default(PENDING) // Fortschritt für das Ausfüllen des Fragebogens
+    inviteToken String?   @unique // optional, null nach Einlösung
+    email       String
+    completedAt DateTime?
+
+    lastReminderSentAt DateTime? // optional, wann wurde das letzte Mal eine Erinnerung gesendet
 
     teamId String
     team   Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)

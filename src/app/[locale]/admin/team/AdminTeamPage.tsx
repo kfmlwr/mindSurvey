@@ -31,6 +31,7 @@ import {
   Trash2,
   MoreHorizontal,
   Eye,
+  Edit,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -39,6 +40,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import React from "react";
 import CreateTeamDialog from "./CreateTeamDialog";
 import AdminTeamResultsDialog from "./AdminTeamResultsDialog";
+import UpdateTeamDialog from "./UpdateTeamDialog";
 
 type TeamData = RouterOutputs["admin"]["getAllTeams"][number];
 
@@ -55,6 +57,9 @@ export default function TeamAdminPage({ teams }: Props) {
     null,
   );
   const [viewResultsDialogOpen, setViewResultsDialogOpen] = React.useState<
+    string | null
+  >(null);
+  const [updateTeamDialogOpen, setUpdateTeamDialogOpen] = React.useState<
     string | null
   >(null);
 
@@ -165,25 +170,36 @@ export default function TeamAdminPage({ teams }: Props) {
       accessorKey: "releasedResults",
       header: t("released"),
       cell: ({ row }) => {
-        const released = row.getValue("releasedResults") as number;
-        const completed = row.getValue("completedSurveys") as number;
-        const hasUnreleased = completed > released;
+        const data = row.original;
 
         return (
-          <div className="flex items-center gap-2">
-            {hasUnreleased ? (
+          <div>
+            {!data.isResultsReleased ? (
               <Clock className="text-destructive h-4 w-4" />
             ) : (
               <CheckCircle className="h-4 w-4 text-green-500" />
             )}
-            <span>
-              {released}/{completed}
-            </span>
-            {hasUnreleased && (
-              <Badge variant="outline" className="text-destructive">
-                {t("pending")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "tags",
+      header: t("tags"),
+      cell: ({ row }) => {
+        const tags = row.original.tags || [];
+
+        return (
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <Badge
+                key={tag.id}
+                variant="outline"
+                className={`bg-${tag.color}-500`}
+              >
+                {tag.label}
               </Badge>
-            )}
+            ))}
           </div>
         );
       },
@@ -205,8 +221,6 @@ export default function TeamAdminPage({ teams }: Props) {
       header: t("actions"),
       cell: ({ row }) => {
         const team = row.original;
-        const hasUnreleasedResults =
-          team.completedSurveys > team.releasedResults;
 
         return (
           <DropdownMenu>
@@ -217,15 +231,20 @@ export default function TeamAdminPage({ teams }: Props) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {team.completedSurveys === team.memberCount && (
-                <DropdownMenuItem
-                  onClick={() => setViewResultsDialogOpen(team.id)}
-                >
-                  <Eye className="h-4 w-4" />
-                  {t("viewResults")}
-                </DropdownMenuItem>
-              )}
-              {hasUnreleasedResults && (
+              <DropdownMenuItem
+                onClick={() => setUpdateTeamDialogOpen(team.id)}
+              >
+                <Edit className="h-4 w-4" />
+                {t("editTeam")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setViewResultsDialogOpen(team.id)}
+              >
+                <Eye className="h-4 w-4" />
+                {t("viewResults")}
+              </DropdownMenuItem>
+
+              {!team.isResultsReleased && (
                 <DropdownMenuItem
                   onClick={() => setReleaseDialogOpen(team.id)}
                   disabled={releaseTeamResults.isPending}
@@ -349,6 +368,15 @@ export default function TeamAdminPage({ teams }: Props) {
         open={!!viewResultsDialogOpen}
         onOpenChange={() => setViewResultsDialogOpen(null)}
       />
+
+      {/* Update Team Dialog */}
+      {updateTeamDialogOpen && (
+        <UpdateTeamDialog
+          team={data?.find((team) => team.id === updateTeamDialogOpen)!}
+          open={!!updateTeamDialogOpen}
+          onOpenChange={() => setUpdateTeamDialogOpen(null)}
+        />
+      )}
     </div>
   );
 }

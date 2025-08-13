@@ -28,7 +28,6 @@ import {
   ShieldCheck,
   Trash2,
   MoreHorizontal,
-  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";

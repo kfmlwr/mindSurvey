@@ -24,7 +24,7 @@ import { env } from "~/env";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  lastName: z.string().optional(),
   email: z.string().email("Please enter a valid email address"),
   agreeToContact: z.boolean().refine((value) => value === true, {
     message: "You must agree to be contacted",
@@ -65,7 +65,7 @@ export function SurveyForm() {
     const promise = createEmailMutation.mutateAsync({
       email: data.email,
       firstname: data.firstName,
-      lastname: data.lastName,
+      lastname: data.lastName || undefined,
       termsAndConditions: data.agreeToContact,
       captchaToken: token ?? "",
     });
