@@ -33,6 +33,10 @@ const data = [
         title: "Admins",
         url: "/admin/users",
       },
+      {
+        title: "Tags",
+        url: "/admin/tags",
+      },
     ],
   },
 ];

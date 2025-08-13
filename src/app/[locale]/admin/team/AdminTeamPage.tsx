@@ -22,6 +22,7 @@ import {
 
 import { type ColumnDef } from "@tanstack/react-table";
 import { Badge } from "~/components/ui/badge";
+import { TagBadge } from "~/components/ui/tag-badge";
 import {
   Calendar,
   Users,
@@ -32,6 +33,9 @@ import {
   MoreHorizontal,
   Eye,
   Edit,
+  Tag,
+  ShieldUser,
+  UserPen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -68,6 +72,8 @@ export default function TeamAdminPage({ teams }: Props) {
   const { data, isLoading, refetch } = useQuery(
     trpc.admin.getAllTeams.queryOptions(undefined, { initialData: teams }),
   );
+
+  const { data: allTags } = useQuery(trpc.admin.getAllTags.queryOptions());
 
   const releaseTeamResults = useMutation(
     trpc.admin.releaseTeamResults.mutationOptions({
@@ -112,6 +118,37 @@ export default function TeamAdminPage({ teams }: Props) {
       error: (error) => t("teamDeletedError", { error: error.message }),
     });
   };
+
+  // Create filters configuration
+  const filters = React.useMemo(() => {
+    if (!allTags) return [];
+
+    return [
+      {
+        columnId: "tags",
+        title: t("filterByTags"),
+        options: allTags.map((tag) => ({
+          label: tag.label,
+          value: tag.id,
+          icon: Tag,
+        })),
+      },
+      {
+        columnId: "isSelfCreated",
+        title: t("filterBySelfCreated"),
+        options: [
+          {
+            label: t("selfCreatedYes"),
+            value: "false",
+          },
+          {
+            label: t("selfCreatedNo"),
+            value: "true",
+          },
+        ],
+      },
+    ];
+  }, [allTags, t]);
 
   const columns: ColumnDef<TeamData>[] = [
     {
@@ -184,6 +221,40 @@ export default function TeamAdminPage({ teams }: Props) {
       },
     },
     {
+      accessorKey: "isSelfCreated",
+      header: t("selfCreated"),
+      cell: ({ row }) => {
+        const data = row.original;
+
+        return (
+          <div>
+            {data.isSelfCreated ? (
+              <UserPen className="text-destructive h-4 w-4" />
+            ) : (
+              <ShieldUser className="h-4 w-4 text-green-500" />
+            )}
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        const isSelfCreated = row.original.isSelfCreated;
+        // value is an array of selected filter values
+        if (!value || !Array.isArray(value) || value.length === 0) {
+          return true; // No filter applied
+        }
+
+        // Check if any of the selected values match the current row
+        return value.some((filterValue) => {
+          if (filterValue === "true") {
+            return isSelfCreated;
+          } else if (filterValue === "false") {
+            return !isSelfCreated;
+          }
+          return false;
+        });
+      },
+    },
+    {
       accessorKey: "tags",
       header: t("tags"),
       cell: ({ row }) => {
@@ -192,16 +263,20 @@ export default function TeamAdminPage({ teams }: Props) {
         return (
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <Badge
+              <TagBadge
                 key={tag.id}
+                label={tag.label}
+                color={tag.color}
                 variant="outline"
-                className={`bg-${tag.color}-500`}
-              >
-                {tag.label}
-              </Badge>
+              />
             ))}
           </div>
         );
+      },
+      filterFn: (row, id, value) => {
+        const tags = row.original.tags || [];
+        const tagIds = tags.map((tag) => tag.id);
+        return value.some((v: string) => tagIds.includes(v));
       },
     },
     {
@@ -297,6 +372,7 @@ export default function TeamAdminPage({ teams }: Props) {
             emptyMessage={t("noTeamsFound")}
             enableRowSelection={false}
             disableColumnVisibility={false}
+            filters={filters}
             buttons={<CreateTeamDialog />}
           />
         </CardContent>

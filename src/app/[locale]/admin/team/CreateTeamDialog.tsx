@@ -25,8 +25,15 @@ import { Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import React from "react";
+import {
+  MultiSelect,
+  MultiSelectTrigger,
+  MultiSelectValue,
+  MultiSelectContent,
+  MultiSelectItem,
+} from "~/components/ui/multi-select";
 
 const createTeamSchema = z
   .object({
@@ -42,6 +49,7 @@ const createTeamSchema = z
         5,
         "At least 5 team members are required (in addition to the owner)",
       ),
+    tagIds: z.array(z.string()).optional().default([]),
   })
   .superRefine((data, ctx) => {
     const owner = data.ownerEmail.trim().toLowerCase();
@@ -89,6 +97,11 @@ export default function CreateTeamDialog() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  // Get all available tags
+  const { data: tags = [] } = useQuery(
+    trpc.admin.getAllTags.queryOptions(),
+  );
+
   const form = useForm<CreateTeamFormData>({
     resolver: zodResolver(createTeamSchema),
     defaultValues: {
@@ -101,6 +114,7 @@ export default function CreateTeamDialog() {
         { email: "" },
         { email: "" },
       ],
+      tagIds: [],
     },
   });
 
@@ -174,6 +188,42 @@ export default function CreateTeamDialog() {
                       placeholder={t("ownerEmailPlaceholder")}
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tagIds"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("tagsLabel")}</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      values={field.value}
+                      onValuesChange={field.onChange}
+                    >
+                      <MultiSelectTrigger className="w-full">
+                        <MultiSelectValue placeholder={t("selectTags")} />
+                      </MultiSelectTrigger>
+                      <MultiSelectContent emptyMessage={t("noTagsAvailable")}>
+                        {tags.map((tag) => (
+                          <MultiSelectItem key={tag.id} value={tag.id}>
+                            <div className="flex items-center gap-2">
+                              {tag.color && (
+                                <div
+                                  className="h-3 w-3 rounded-full"
+                                  style={{ backgroundColor: tag.color }}
+                                />
+                              )}
+                              {tag.label}
+                            </div>
+                          </MultiSelectItem>
+                        ))}
+                      </MultiSelectContent>
+                    </MultiSelect>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

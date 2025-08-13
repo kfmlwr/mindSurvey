@@ -37,6 +37,7 @@ const createTeamSchema = z.object({
       },
       { message: "All member emails must be unique" },
     ),
+  tagIds: z.array(z.string()).optional().default([]),
 });
 
 const requireAdmin = (ctx: any) => {
@@ -118,6 +119,18 @@ export const adminRouter = createTRPCRouter({
         memberInvites.push(invite);
       }
 
+      // Assign tags to the team if provided
+      if (input.tagIds && input.tagIds.length > 0) {
+        const tagAssignments = input.tagIds.map((tagId) => ({
+          teamId: team.id,
+          tagId: tagId,
+        }));
+
+        await ctx.db.tagsOnTeams.createMany({
+          data: tagAssignments,
+        });
+      }
+
       return {
         id: team.id,
         name: team.name,
@@ -178,6 +191,7 @@ export const adminRouter = createTRPCRouter({
       name: team.name,
       createdAt: team.createdAt,
       updatedAt: team.updatedAt,
+      isSelfCreated: team.createdById === null,
       owner: team.owner,
       isResultsReleased: team.resultsReleased !== null,
       memberCount: team._count.invitations,
@@ -192,6 +206,92 @@ export const adminRouter = createTRPCRouter({
       })),
     }));
   }),
+
+  // Get all available tags
+  getAllTags: protectedProcedure.query(async ({ ctx }) => {
+    requireAdmin(ctx);
+
+    const tags = await ctx.db.tag.findMany({
+      orderBy: {
+        label: "asc",
+      },
+    });
+
+    return tags;
+  }),
+
+  // Create a new tag
+  createTag: protectedProcedure
+    .input(
+      z.object({
+        label: z
+          .string()
+          .min(1, "Tag label is required")
+          .max(50, "Tag label must be less than 50 characters"),
+        color: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+
+      // Check if tag with same label already exists
+      const existingTag = await ctx.db.tag.findUnique({
+        where: { label: input.label },
+      });
+
+      if (existingTag) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "A tag with this label already exists",
+        });
+      }
+
+      const tag = await ctx.db.tag.create({
+        data: {
+          label: input.label,
+          color: input.color,
+        },
+      });
+
+      return tag;
+    }),
+
+  // Delete a tag
+  deleteTag: protectedProcedure
+    .input(
+      z.object({
+        tagId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+
+      // Check if tag exists
+      const tag = await ctx.db.tag.findUnique({
+        where: { id: input.tagId },
+        include: {
+          _count: {
+            select: {
+              tagsOnTeams: true,
+            },
+          },
+        },
+      });
+
+      if (!tag) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Tag not found",
+        });
+      }
+
+      // Delete the tag (cascade will handle TagsOnTeams)
+      await ctx.db.tag.delete({
+        where: { id: input.tagId },
+      });
+
+      return { success: true };
+    }),
 
   // Release results for all members of a team
   releaseTeamResults: protectedProcedure
@@ -524,6 +624,7 @@ export const adminRouter = createTRPCRouter({
           .string()
           .min(1, "Owner email is required")
           .email("Please enter a valid email address"),
+        tagIds: z.array(z.string()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -593,12 +694,150 @@ export const adminRouter = createTRPCRouter({
         },
       });
 
+      // Handle tag updates if provided
+      if (input.tagIds !== undefined) {
+        // First, remove all existing tags for this team
+        await ctx.db.tagsOnTeams.deleteMany({
+          where: { teamId: input.teamId },
+        });
+
+        // Then, add the new tags
+        if (input.tagIds.length > 0) {
+          const tagAssignments = input.tagIds.map((tagId) => ({
+            teamId: input.teamId,
+            tagId: tagId,
+          }));
+
+          await ctx.db.tagsOnTeams.createMany({
+            data: tagAssignments,
+          });
+        }
+      }
+
       return {
         id: updatedTeam.id,
         name: updatedTeam.name,
         updatedAt: updatedTeam.updatedAt,
         owner: updatedTeam.owner,
       };
+    }),
+
+  // Add team member
+  addTeamMember: protectedProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+        email: z
+          .string()
+          .min(1, "Member email is required")
+          .email("Please enter a valid email address"),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+
+      const team = await ctx.db.team.findUnique({
+        where: { id: input.teamId },
+        include: {
+          owner: true,
+          invitations: true,
+        },
+      });
+
+      if (!team) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Team not found",
+        });
+      }
+
+      // Check if email already exists in team (including owner)
+      const existingEmails = [
+        team.owner.email,
+        ...team.invitations.map((inv) => inv.email),
+      ];
+
+      if (existingEmails.includes(input.email.toLowerCase())) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "This email is already a member of the team",
+        });
+      }
+
+      // Create the invite
+      const invite = await ctx.db.invite.create({
+        data: {
+          email: input.email.toLowerCase(),
+          teamId: input.teamId,
+          inviteToken: randomBytes(64).toString("hex"),
+        },
+      });
+
+      return {
+        id: invite.id,
+        email: invite.email,
+        status: invite.status,
+        createdAt: invite.createdAt,
+      };
+    }),
+
+  // Remove team member
+  removeTeamMember: protectedProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+        inviteId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      requireAdmin(ctx);
+
+      const invite = await ctx.db.invite.findUnique({
+        where: { id: input.inviteId },
+        include: {
+          team: {
+            include: {
+              owner: true,
+            },
+          },
+        },
+      });
+
+      if (!invite) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invite not found",
+        });
+      }
+
+      if (invite.teamId !== input.teamId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invite does not belong to this team",
+        });
+      }
+
+      // Prevent removing the team owner
+      if (invite.userId === invite.team.ownerId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot remove the team owner",
+        });
+      }
+
+      // Delete all answers for this invite first
+      await ctx.db.answer.deleteMany({
+        where: {
+          inviteId: input.inviteId,
+        },
+      });
+
+      // Delete the invite
+      await ctx.db.invite.delete({
+        where: { id: input.inviteId },
+      });
+
+      return { success: true };
     }),
 
   // Delete user (with safety checks)
