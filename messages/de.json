@@ -96,7 +96,8 @@
     "submitting": "Umfrage wird eingereicht...",
     "submitSuccess": "Umfrage erfolgreich eingereicht!",
     "submitError": "Fehler beim Einreichen der Umfrage, bitte versuche es erneut.",
-    "backToTeam": "Zurück zum Team"
+    "backToTeam": "Zurück zum Team",
+    "loading": "Lade Umfrage..."
   },
   "SurveyResult": {
     "title": "Umfrageergebnis",

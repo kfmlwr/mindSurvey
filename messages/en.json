@@ -95,7 +95,8 @@
     "submitting": "Submitting survey...",
     "submitSuccess": "Survey submitted successfully!",
     "submitError": "Error submitting survey, please try again.",
-    "backToTeam": "Back to Team"
+    "backToTeam": "Back to Team",
+    "loading": "Loading survey..."
   },
   "SurveyResult": {
     "title": "Survey Result",
