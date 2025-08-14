@@ -145,7 +145,7 @@ export const teamRouter = createTRPCRouter({
       const currentMemberCount = await ctx.db.invite.count({
         where: { teamId: invite.teamId },
       });
-      
+
       if (currentMemberCount <= 5) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -205,12 +205,12 @@ export const teamRouter = createTRPCRouter({
 
       // Count current team members (excluding the leader)
       const memberCount = team.invitations.filter(
-        (invite) => invite.userId !== team.ownerId
+        (invite) => invite.userId !== team.ownerId,
       ).length;
 
       // Check if team already has exactly 5 members (owner + 4 invitations)
       const currentTotalMembers = team.invitations.length;
-      if (currentTotalMembers >= 5) {
+      if (currentTotalMembers > 5) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Team already has the maximum of 5 members",
@@ -243,12 +243,13 @@ export const teamRouter = createTRPCRouter({
         // If this is the 5th member, send emails to all previous members too
         if (memberCount === 4) {
           const pendingInvites = team.invitations.filter(
-            (invite) => invite.userId !== team.ownerId && invite.status === "PENDING"
+            (invite) =>
+              invite.userId !== team.ownerId && invite.status === "PENDING",
           );
 
           for (const pendingInvite of pendingInvites) {
             const pendingUrl = `${env.BASE_URL}/${locale}/survey/${pendingInvite.inviteToken}`;
-            
+
             await resend.emails.send({
               from: env.EMAIL_FROM,
               to: [pendingInvite.email],
@@ -351,14 +352,16 @@ export const teamRouter = createTRPCRouter({
       );
 
       // Get current user's invite for resultsReleased check
-      const userInvite = invites.find(invite => invite.userId === ctx.session.user.id);
-      
+      const userInvite = invites.find(
+        (invite) => invite.userId === ctx.session.user.id,
+      );
+
       if (!isAllCompleted) {
         return {
           isAllCompleted: false,
           teamAverage: null,
           userResult: null,
-          resultsReleased: userInvite?.resultsReleased || null,
+          resultsReleased: team.resultsReleased || null,
         };
       }
 
@@ -375,23 +378,27 @@ export const teamRouter = createTRPCRouter({
       });
 
       // Get current user's answers
-      const userAnswers = userInvite ? await ctx.db.answer.findMany({
-        where: {
-          inviteId: userInvite.id,
-        },
-        include: {
-          pair: true,
-        },
-      }) : [];
+      const userAnswers = userInvite
+        ? await ctx.db.answer.findMany({
+            where: {
+              inviteId: userInvite.id,
+            },
+            include: {
+              pair: true,
+            },
+          })
+        : [];
 
-      const teamAverage = allAnswers.length > 0 ? calculateResult(allAnswers) : null;
-      const userResult = userAnswers.length > 0 ? calculateResult(userAnswers) : null;
+      const teamAverage =
+        allAnswers.length > 0 ? calculateResult(allAnswers) : null;
+      const userResult =
+        userAnswers.length > 0 ? calculateResult(userAnswers) : null;
 
       return {
         isAllCompleted: true,
         teamAverage,
         userResult,
-        resultsReleased: userInvite?.resultsReleased || null,
+        resultsReleased: team?.resultsReleased || null,
       };
     }),
 
