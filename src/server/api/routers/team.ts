@@ -140,6 +140,19 @@ export const teamRouter = createTRPCRouter({
           message: "You are not authorized to remove this invite",
         });
       }
+
+      // Check if removing this member would result in fewer than 5 total members
+      const currentMemberCount = await ctx.db.invite.count({
+        where: { teamId: invite.teamId },
+      });
+      
+      if (currentMemberCount <= 5) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot remove member. Team must have exactly 5 members.",
+        });
+      }
+
       await ctx.db.invite.delete({
         where: { id: input.inviteId },
       });
@@ -194,6 +207,15 @@ export const teamRouter = createTRPCRouter({
       const memberCount = team.invitations.filter(
         (invite) => invite.userId !== team.ownerId
       ).length;
+
+      // Check if team already has exactly 5 members (owner + 4 invitations)
+      const currentTotalMembers = team.invitations.length;
+      if (currentTotalMembers >= 5) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Team already has the maximum of 5 members",
+        });
+      }
 
       // Only send email invitations once we have at least 5 team members
       const shouldSendEmail = memberCount >= 4; // Will be 5 after creating this invite

@@ -28,7 +28,7 @@ const createTeamSchema = z.object({
           .email("Please enter a valid email address"),
       }),
     )
-    .min(5, "At least 5 team members are required (in addition to the owner)")
+    .length(5, "Exactly 5 team members are required (in addition to the owner)")
     .refine(
       (members) => {
         const emails = members.map((m) => m.email.toLowerCase());
@@ -764,6 +764,15 @@ export const adminRouter = createTRPCRouter({
         });
       }
 
+      // Check if team already has exactly 5 members (owner + 4 invitations)
+      const currentMemberCount = team.invitations.length + 1; // +1 for owner
+      if (currentMemberCount >= 5) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Team already has the maximum of 5 members",
+        });
+      }
+
       // Create the invite
       const invite = await ctx.db.invite.create({
         data: {
@@ -822,6 +831,18 @@ export const adminRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Cannot remove the team owner",
+        });
+      }
+
+      // Check if removing this member would result in fewer than 5 total members
+      const currentMemberCount = await ctx.db.invite.count({
+        where: { teamId: input.teamId },
+      });
+      
+      if (currentMemberCount <= 5) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot remove member. Team must have exactly 5 members.",
         });
       }
 

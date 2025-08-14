@@ -127,17 +127,22 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
       <div>
         <h2 className="mb-4 text-xl font-semibold">{t("title")}</h2>
 
-        {/* Minimum members requirement info */}
-        {memberCount < 5 && (
+        {/* Exact members requirement info */}
+        {memberCount !== 5 && (
           <Alert className="mb-4">
             <Info className="h-4 w-4" />
             <AlertDescription>
               {memberCount === 0
-                ? t("minimumMembersRequired")
-                : t("addMoreMembers", { 
-                    count: 5 - memberCount,
-                    plural: 5 - memberCount === 1 ? "" : "s"
-                  })}
+                ? t("exactMembersRequired")
+                : memberCount < 5
+                  ? t("addMoreMembers", { 
+                      count: 5 - memberCount,
+                      plural: 5 - memberCount === 1 ? "" : "s"
+                    })
+                  : t("tooManyMembers", { 
+                      count: memberCount - 5,
+                      plural: memberCount - 5 === 1 ? "" : "s"
+                    })}
               <br />
               <span className="text-muted-foreground text-xs">
                 {t("currentMembersCount", { current: memberCount })}
@@ -156,7 +161,7 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
           />
           <Button
             onClick={() => handleInvite()}
-            disabled={inviteMutation.isPending}
+            disabled={inviteMutation.isPending || memberCount >= 5}
           >
             {inviteMutation.isPending && (
               <Loader2 className="mr-2 animate-spin" />
@@ -165,11 +170,11 @@ export default function MembersTab({ members, teamId, leaderInvite }: Props) {
           </Button>
         </div>
 
-        {memberCount >= 5 && (
+        {memberCount === 5 && (
           <Alert className="mt-4 border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800">
-              {t("minimumReached")}
+              {t("exactMembersReached")}
             </AlertDescription>
           </Alert>
         )}

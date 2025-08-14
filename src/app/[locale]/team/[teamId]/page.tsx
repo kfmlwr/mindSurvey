@@ -1,9 +1,5 @@
 import { Button } from "~/components/ui/button";
 
-import { OverviewTab } from "../_components/overview";
-import { MembersTab } from "../_components/team";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ResultsTab } from "../_components/results";
 import { ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -37,7 +33,8 @@ export default async function TeamHome({ params }: PageProps) {
         </div>
         {/* Tabs */}
         <div className="mb-6">
-          <Tabs defaultValue="overview">
+          <ResultsTab teamId={teamId} />
+          {/* <Tabs defaultValue="overview">
             <TabsList className="mb-6">
               <TabsTrigger value="overview">{t("overview")}</TabsTrigger>
               <TabsTrigger value="team">{t("team")}</TabsTrigger>
@@ -56,7 +53,7 @@ export default async function TeamHome({ params }: PageProps) {
             <TabsContent value="results">
               <ResultsTab teamId={teamId} />
             </TabsContent>
-          </Tabs>
+          </Tabs> */}
         </div>
       </div>
     </div>

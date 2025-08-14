@@ -45,9 +45,9 @@ const createTeamSchema = z
           email: z.string().min(1, "Member email is required").email(),
         }),
       )
-      .min(
+      .length(
         5,
-        "At least 5 team members are required (in addition to the owner)",
+        "Exactly 5 team members are required (in addition to the owner)",
       ),
     tagIds: z.array(z.string()).optional().default([]),
   })
@@ -233,13 +233,14 @@ export default function CreateTeamDialog() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <FormLabel className="text-base font-medium">
-                  {t("teamMembersLabel")} ({fields.length}/∞)
+                  {t("teamMembersLabel")} ({fields.length}/5)
                 </FormLabel>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => append({ email: "" })}
+                  disabled={fields.length >= 5}
                 >
                   <Plus className="mr-1 h-4 w-4" />
                   {t("addMember")}
@@ -247,7 +248,7 @@ export default function CreateTeamDialog() {
               </div>
 
               <div className="text-muted-foreground text-sm">
-                {t("minimumMembersNote")}
+                {t("exactMembersNote")}
               </div>
 
               <div className="space-y-3">
@@ -271,17 +272,16 @@ export default function CreateTeamDialog() {
                         </FormItem>
                       )}
                     />
-                    {fields.length > 5 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => remove(index)}
-                        className="shrink-0"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="shrink-0"
+                      disabled={fields.length <= 5}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </div>

@@ -197,6 +197,16 @@ export default function UpdateTeamDialog({
 
   const onSubmit: SubmitHandler<UpdateTeamFormData> = async (data) => {
     try {
+      // Check if adding new members would exceed the 5-member limit
+      const currentMemberCount = existingMembers.length + 1; // +1 for owner
+      const newMembersCount = data.newMembers.filter(m => m.email.trim()).length;
+      const totalMemberCount = currentMemberCount + newMembersCount;
+
+      if (totalMemberCount > 5) {
+        toast.error(`Cannot add ${newMembersCount} member(s). Team would have ${totalMemberCount} members, but exactly 5 are required.`);
+        return;
+      }
+
       // Update basic team info and tags
       await updateTeam.mutateAsync({
         teamId: team.id,
@@ -371,11 +381,23 @@ export default function UpdateTeamDialog({
                   variant="outline"
                   size="sm"
                   onClick={() => append({ email: "" })}
+                  disabled={(existingMembers.length + 1 + fields.length) >= 5}
                 >
                   <Plus className="mr-1 h-4 w-4" />
                   {t("addMember")}
                 </Button>
               </div>
+
+              {(existingMembers.length + 1) >= 5 && (
+                <div className="text-muted-foreground text-sm">
+                  {t("teamAlreadyHasMaxMembers")}
+                </div>
+              )}
+              {(existingMembers.length + 1) < 5 && (
+                <div className="text-muted-foreground text-sm">
+                  {t("canAdd")} {5 - (existingMembers.length + 1)} {t("moreMembers")}
+                </div>
+              )}
 
               {fields.length > 0 && (
                 <div className="space-y-3">
