@@ -33,17 +33,17 @@ export default async function Page({ params }: PageProps) {
   // If invite has a connected user (team leader), show results
   if (surveyStatus.invite.userId) {
     // Check if results are released for team average
-    if (!surveyStatus.invite.resultsReleased) {
-      return (
-        <div className="flex min-h-screen items-center justify-center p-6">
-          <div className="mx-auto w-full max-w-2xl">
-            <Alert variant="destructive">
-              <AlertDescription>{t("resultsNotReleased")}</AlertDescription>
-            </Alert>
-          </div>
-        </div>
-      );
-    }
+    // if (!surveyStatus.invite.resultsReleased) {
+    //   return (
+    //     <div className="flex min-h-screen items-center justify-center p-6">
+    //       <div className="mx-auto w-full max-w-2xl">
+    //         <Alert variant="destructive">
+    //           <AlertDescription>{t("resultsNotReleased")}</AlertDescription>
+    //         </Alert>
+    //       </div>
+    //     </div>
+    //   );
+    // }
 
     // Show results for user with connected account
     return (
