@@ -1,6 +1,7 @@
 import { auth } from "~/server/auth";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Navbar } from "./_components/Navbar";
+import { redirect } from "~/i18n/navigation";
 
 export default async function TeamLayout({
   children,
@@ -8,14 +9,11 @@ export default async function TeamLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const locale = await getLocale();
   const t = await getTranslations("Errors");
 
   if (!session) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-lg">{t("notLoggedIn")}</p>
-      </div>
-    );
+    return redirect({ href: "/", locale });
   }
 
   return (

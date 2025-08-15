@@ -13,7 +13,7 @@ interface PageProps {
 export default async function TeamHome({ params }: PageProps) {
   const { teamId } = await params;
   const t = await getTranslations("TeamPage");
-  const members = await api.team.listAllInvites({ teamId });
+  // const members = await api.team.listAllInvites({ teamId });
   const leaderInvite = await api.invite.getLeaderInvite({ teamId });
 
   return (
