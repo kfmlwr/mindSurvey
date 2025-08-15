@@ -241,25 +241,24 @@ export const teamRouter = createTRPCRouter({
         }
 
         // If this is the 5th member, send emails to all previous members too
-        if (memberCount === 4) {
-          const pendingInvites = team.invitations.filter(
-            (invite) =>
-              invite.userId !== team.ownerId && invite.status === "PENDING",
-          );
 
-          for (const pendingInvite of pendingInvites) {
-            const pendingUrl = `${env.BASE_URL}/${locale}/survey/${pendingInvite.inviteToken}`;
+        const pendingInvites = team.invitations.filter(
+          (invite) =>
+            invite.userId !== team.ownerId && invite.status === "PENDING",
+        );
 
-            await resend.emails.send({
-              from: env.EMAIL_FROM,
-              to: [pendingInvite.email],
-              subject: "Invitation to MindClip",
-              react: await InviteMemberEmailTemplate({
-                inviterName: ctx.session.user.email ?? undefined,
-                url: pendingUrl,
-              }),
-            });
-          }
+        for (const pendingInvite of pendingInvites) {
+          const pendingUrl = `${env.BASE_URL}/${locale}/survey/${pendingInvite.inviteToken}`;
+
+          await resend.emails.send({
+            from: env.EMAIL_FROM,
+            to: [pendingInvite.email],
+            subject: "Invitation to MindClip",
+            react: await InviteMemberEmailTemplate({
+              inviterName: ctx.session.user.email ?? undefined,
+              url: pendingUrl,
+            }),
+          });
         }
       }
 
